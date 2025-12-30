@@ -1,0 +1,3168 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+  <title>ハルタン1800</title>
+
+  <style>
+    :root{
+      --bd: #ddd;
+      --bd-dark: #2a2f3a;
+      --bg: #fff;
+      --fg: #111;
+      --muted: #666;
+      --card: #fff;
+      --card-dark: #171a21;
+
+      --pill-pad-y: 10px;
+      --pill-pad-x: 12px;
+      --pill-radius: 999px;
+
+      --btn-radius: 12px;
+
+      --review-bg: #f3f6fb;
+      --review-bd: #cfd8e3;
+      --review-fg: #334155;
+
+      --review-bg-hover: #e9eef7;
+      --review-accent: #64748b;
+
+      /* wheel */
+      --wheel-item-h: 44px;
+      --wheel-fade: rgba(255,255,255,0.9);
+      --wheel-fade-dark: rgba(15,17,21,0.85);
+    }
+
+    body{
+      font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--fg);
+      transition: background .2s ease, color .2s ease;
+    }
+
+    .card{
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 18px;
+      border: 1px solid var(--bd);
+      border-radius: 14px;
+      background: var(--card);
+      transition: background .2s ease, border-color .2s ease;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top: 10px;
+    }
+
+    .badge,
+    button.small,
+    .pill{
+      font-size: 14px;
+      line-height: 1;
+      padding: var(--pill-pad-y) var(--pill-pad-x);
+      border-radius: var(--pill-radius);
+      border: 1px solid var(--bd);
+      background: transparent;
+      color: inherit;
+      transition: background .2s ease, border-color .2s ease, color .2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .pill{ cursor: pointer; }
+    button.small{ cursor: pointer; }
+    button.small:active{ transform: translateY(1px); }
+
+    .btns{
+      display:flex;
+      gap:10px;
+      margin-top: 16px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      font-size: 18px;
+      padding: 12px 14px;
+      border-radius: var(--btn-radius);
+      border: 1px solid var(--bd);
+      background: #fff;
+      color: #111;
+      cursor: pointer;
+      transition: background .2s ease, border-color .2s ease, color .2s ease;
+    }
+    button:active{ transform: translateY(1px); }
+
+    button.small.toggle{ font-size: 18px; }
+
+    #speakBtn{
+      margin-left: auto;
+      margin-right: 4px;
+    }
+
+    .primary{ font-weight: 500; }
+    .danger{ border-color:#f2c; }
+    .toggle{ border-color:#88c; }
+    .pill.togglePill{ border-color:#88c; }
+
+    .pill input[type="checkbox"]{
+      width:18px;
+      height:18px;
+      margin:0;
+      accent-color: #88c;
+      transform: translateY(0.5px);
+    }
+    .pill .count{
+      opacity: .85;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .reviewUI{
+      background: var(--review-bg);
+      border-color: var(--review-bd);
+      color: var(--review-fg);
+      border-radius: 14px;
+    }
+    @media (hover: hover) and (pointer: fine){
+      .reviewUI:hover{ background: var(--review-bg-hover); }
+    }
+    @media (hover: none){
+      .reviewUI:hover{ background: var(--review-bg); }
+    }
+
+    .pressWhite:active{
+      background: #fff;
+      border-color: var(--review-bd);
+      color: var(--review-fg);
+    }
+    @media (hover: none){
+      .pressWhite:hover{ background: var(--review-bg); }
+    }
+
+    button, label, .pill{
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .reviewUI input[type="checkbox"]{ accent-color: var(--review-accent); }
+
+    .topbar{
+      display: flex;
+      justify-content: space-between; /* 左：進捗 / 右：RESET群 */
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .rangeInput{
+      width: 3.5em;
+      padding: 6px 8px;
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      font-size: 14px;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+    }
+
+    .rangeStack{
+      display:flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .word-no{
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      line-height: 1;
+      user-select: none;
+    }
+
+    .word-num-header{
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: 1px;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .displayArea{ min-height: 140px; }
+
+    .word{
+      margin: 18px 0 10px;
+      line-height: 1.1;
+      word-break: break-word;
+    }
+    .word-text{
+      font-size: 30px;
+      font-weight: 400;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .meaning{
+      font-size: 18px;
+      margin: 10px 0 0;
+      min-height: 40px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .missBox{
+      display:none;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--bd);
+      border-radius: 12px;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: nowrap;
+      width: fit-content;
+      max-width: 100%;
+      flex: 0 0 auto;
+      align-self: flex-start;
+      background: rgba(0,0,0,0.02);
+    }
+    .missBox.show{ display:inline-flex; }
+    .missBox input{ width: 22px; height: 22px; margin:0; }
+    .missBox .label{ font-size: 16px; user-select: none; white-space: nowrap; display: inline-block;}
+
+    /* ダークモード */
+    body.dark{
+      background: #0f1115;
+      color: #e9e9ea;
+    }
+    body.dark .card{
+      background: var(--card-dark);
+      border-color: var(--bd-dark);
+    }
+    body.dark .badge,
+    body.dark button.small,
+    body.dark .pill{
+      border-color: var(--bd-dark);
+      background: rgba(255,255,255,0.03);
+      color: #d6d6d8;
+    }
+    body.dark button{
+      background: #1f2430;
+      border-color: var(--bd-dark);
+      color: #e9e9ea;
+    }
+    body.dark .missBox{
+      border-color: var(--bd-dark);
+      background: rgba(255,255,255,0.03);
+    }
+    body.dark .rangeInput{ border-color: var(--bd-dark); }
+    body.dark .word-num-header{ color:#aaa; }
+
+    body.dark .reviewUI{
+      background: rgba(255,255,255,0.06);
+      border-color: var(--bd-dark);
+      color: #e5e7eb;
+    }
+
+    body.dark .pressWhite:active{
+      background: rgba(255,255,255,0.16);
+      border-color: var(--bd-dark);
+      color: #e5e7eb;
+    }
+
+    .page-title{
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      text-align: center;
+      letter-spacing: 0.03em;
+    }
+    body.dark .page-title{ color: #e9e9ea; }
+
+    /* =========================================================
+       🎡 ホイール（軽量2D）
+    ========================================================= */
+    .modalOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding-left: 14px;
+      padding-right: 14px;
+      padding-top: calc(env(safe-area-inset-top) + 10px);
+      padding-bottom: calc(env(safe-area-inset-bottom) + 14px);
+      z-index: 9999;
+    }
+    .modalOverlay.show{ display:flex; }
+
+    .modalSheet{
+      width: min(500px, 100%);
+      border-radius: 18px;
+      border: 1px solid var(--bd);
+      background: #fff;
+      color: #111;
+      box-shadow: 0 12px 40px rgba(0,0,0,.18);
+      overflow: hidden;
+      transform: translateY(8px);
+      animation: sheetIn .16s ease-out forwards;
+      max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    @keyframes sheetIn{ to{ transform: translateY(0); } }
+    body.dark .modalSheet{
+      background: #171a21;
+      color: #e9e9ea;
+      border-color: var(--bd-dark);
+      box-shadow: 0 12px 40px rgba(0,0,0,.35);
+    }
+
+    .modalHeader{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--bd);
+      gap: 10px;
+    }
+    body.dark .modalHeader{ border-bottom-color: var(--bd-dark); }
+
+    .modalTitle{
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      opacity: .95;
+      user-select: none;
+    }
+
+    .modalHeader .mini{
+      font-size: 14px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--bd);
+      background: transparent;
+      color: inherit;
+    }
+    body.dark .modalHeader .mini{ border-color: var(--bd-dark); background: rgba(255,255,255,0.03); }
+
+    .wheelSearchRow{
+      display:flex;
+      gap:8px;
+      padding: 6px;
+      border-bottom: 1px solid var(--bd);
+    }
+    body.dark .wheelSearchRow{ border-bottom-color: var(--bd-dark); }
+
+    .wheelSearchRow .mini{
+      font-size: 14px;
+      padding: 8px 10px;
+    }
+
+    .wheelSearch{
+      flex: 1;
+      border: 1px solid var(--bd);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      background: transparent;
+      color: inherit;
+      outline: none;
+    }
+    body.dark .wheelSearch{ border-color: var(--bd-dark); }
+
+    .wheelArea{
+      position: relative;
+      padding: 12px 12px 2px;
+    }
+
+    .wheelViewport{
+      position: relative;
+      height: calc(var(--wheel-item-h) * 7);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: y mandatory;
+      overscroll-behavior: contain;
+      border-radius: 16px;
+      border: 1px solid var(--bd);
+      background: rgba(0,0,0,0.02);
+      touch-action: pan-y;
+    }
+    body.dark .wheelViewport{
+      border-color: var(--bd-dark);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .wheelFadeTop, .wheelFadeBottom{
+      pointer-events: none;
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      height: 44px;
+      z-index: 2;
+    }
+    .wheelFadeTop{
+      top: 12px;
+      background: linear-gradient(to bottom, var(--wheel-fade), rgba(255,255,255,0));
+    }
+    .wheelFadeBottom{
+      bottom: 2px;
+      background: linear-gradient(to top, var(--wheel-fade), rgba(255,255,255,0));
+    }
+    body.dark .wheelFadeTop{
+      background: linear-gradient(to bottom, var(--wheel-fade-dark), rgba(15,17,21,0));
+    }
+    body.dark .wheelFadeBottom{
+      background: linear-gradient(to top, var(--wheel-fade-dark), rgba(15,17,21,0));
+    }
+
+    .wheelCenterLine{
+      pointer-events: none;
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: calc(12px + (var(--wheel-item-h) * 3));
+      height: var(--wheel-item-h);
+      border-top: 1px solid rgba(100,116,139,0.35);
+      border-bottom: 1px solid rgba(100,116,139,0.35);
+      border-radius: 14px;
+      z-index: 3;
+    }
+
+    .wheelList{
+      position: relative;
+      padding: calc(var(--wheel-item-h) * 3) 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .wheelItem{
+      height: var(--wheel-item-h);
+      display:flex;
+      align-items:center;
+      justify-content: center;
+      scroll-snap-align: center;
+      user-select: none;
+      padding: 0 14px;
+    }
+
+    .wheelItemInner{
+      width: 100%;
+      max-width: 92%;
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      line-height: 1.15;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      display: grid;
+      grid-template-columns: 3.2em 1fr;
+      column-gap: 10px;
+      align-items: center;
+    }
+
+    .wheelItemInner .num{
+      font-size: 12px;
+      opacity: .70;
+      font-variant-numeric: tabular-nums;
+      justify-self: start;
+      user-select: none;
+    }
+
+    .wheelItemInner .main{
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .wheelItemInner .ja{
+      display: block;
+      font-size: 12px;
+      opacity: .70;
+      margin-top: 2px;
+      line-height: 1.2;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    /* ★軽量：選択中っぽい行だけ色付け（3Dなし） */
+    .wheelItem.isActive .wheelItemInner{
+      border-color: rgba(100,116,139,0.25);
+      background: rgba(100,116,139,0.06);
+    }
+
+    .wheelFooter{
+      display:flex;
+      gap:10px;
+      padding: 8px;
+      border-top: 1px solid var(--bd);
+      justify-content: space-between;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    body.dark .wheelFooter{ border-top-color: var(--bd-dark); }
+
+    .wheelHint{
+      font-size: 12px;
+      opacity: .75;
+      padding: 0 12px 10px;
+      user-select: none;
+      min-height: 1.2em;
+    }
+
+    .mini{
+      font-size: 14px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--bd);
+      background: transparent;
+      color: inherit;
+    }
+    body.dark .mini{ border-color: var(--bd-dark); background: rgba(255,255,255,0.03); }
+        /* PC/iPadではカードを細くして縦長に見せる */
+    @media (min-width: 768px){
+      .card{
+        max-width: 300px;  /* 好みで 520〜680 くらいで調整 */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1 id="pageTitle" class="page-title"></h1>
+
+    <div class="topbar">
+      <div class="badge" id="progress">0 / 0</div>
+      <div class="topbar-right">
+        <button id="resetBtn" class="small reviewUI" type="button">Reset</button>
+        <button class="small reviewUI pressWhite" id="clearWrongBtn" type="button">復習Reset</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <label class="pill togglePill reviewUI" for="wrongOnlyToggle">
+        <input type="checkbox" id="wrongOnlyToggle" />
+        復習 <span class="count" id="wrongCount">(0)</span>
+      </label>
+
+      <button class="small toggle" id="audioToggle" type="button">🔊</button>
+      <button class="small toggle" id="themeToggle" type="button">🌙</button>
+      <button class="small toggle" id="orderToggle" type="button">🔀 ランダム</button>
+    </div>
+
+    <div class="row">
+      <div class="rangeStack">
+        <label class="badge" style="display:flex; gap:8px; align-items:center;">
+          No
+          <input id="rangeFrom" class="rangeInput" type="number" min="1" value="1">
+          〜
+          <input id="rangeTo" class="rangeInput" type="number" min="1" value="10">
+        </label>
+        <span class="word-no">No</span>
+        <span id="wordNumHeader" class="word-num-header"></span>
+      </div>
+    </div>
+
+    <div class="displayArea">
+      <div class="word">
+        <span class="word-text" id="wordText">（reading…）</span>
+      </div>
+      <div class="meaning" id="meaning"></div>
+    </div>
+
+    <div class="btns">
+      <button class="primary" id="nextBtn" type="button">はじめる</button>
+    </div>
+
+    <div class="missBox reviewUI" id="missBox">
+      <input type="checkbox" id="missToggle">
+      <label class="label" for="missToggle">復習リストに追加</label>
+    </div>
+
+    <div class="btns">
+      <button id="wheelOpenBtn" type="button">🎡 探す</button>
+      <button id="speakBtn" type="button">🔊 発音</button>
+    </div>
+  </div>
+
+  <!-- 🎡 モーダル -->
+  <div class="modalOverlay" id="wheelOverlay" aria-hidden="true">
+    <div class="modalSheet" role="dialog" aria-modal="true" aria-labelledby="wheelTitle">
+      <div class="modalHeader">
+        <div class="modalTitle" id="wheelTitle">🎡 単語検索（英or日）</div>
+        <button class="mini" id="wheelCloseBtn" type="button">閉じる</button>
+      </div>
+
+      <div class="wheelSearchRow">
+        <input class="wheelSearch" id="wheelSearchInput" type="search" placeholder="キーワード検索" autocomplete="off" />
+        <button class="mini" id="wheelClearSearchBtn" type="button">クリア</button>
+      </div>
+
+      <div class="wheelArea">
+        <div class="wheelFadeTop"></div>
+        <div class="wheelFadeBottom"></div>
+        <div class="wheelCenterLine"></div>
+
+        <div class="wheelViewport" id="wheelViewport">
+          <ul class="wheelList" id="wheelList"></ul>
+        </div>
+      </div>
+
+      <div class="wheelHint" id="wheelHint"></div>
+
+      <div class="wheelFooter">
+        <button class="mini" id="wheelMoreBtn" type="button">さらに表示</button>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-left:auto;">
+          <button class="mini" id="wheelJumpBtn" type="button">この単語へ移動</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const VOCAB = [
+  { en: "the", ja: "その" },
+  { en: "to", ja: "～へ" },
+  { en: "I", ja: "私は" },
+  { en: "a, an", ja: "1つの" },
+  { en: "in", ja: "～の中に" },
+  { en: "and", ja: "そして" },
+  { en: "you", ja: "あなたは" },
+  { en: "is", ja: "～である" },
+  { en: "of", ja: "～の" },
+  { en: "it", ja: "それは" },
+  { en: "have", ja: "～を持っている" },
+  { en: "not", ja: "～でない" },
+  { en: "was", ja: "am / is の過去形" },
+  { en: "that", ja: "あれ" },
+  { en: "for", ja: "～のために" },
+  { en: "he", ja: "彼は" },
+  { en: "do", ja: "（～を）する" },
+  { en: "are", ja: "～である" },
+  { en: "we", ja: "私たちは" },
+  { en: "about", ja: "～について" },
+  { en: "will", ja: "～だろう" },
+  { en: "they", ja: "彼らは／彼女らは" },
+  { en: "people", ja: "人々" },
+  { en: "she", ja: "彼女は" },
+  { en: "at", ja: "～で" },
+  { en: "can", ja: "～できる" },
+  { en: "my", ja: "私の" },
+  { en: "go", ja: "行く" },
+  { en: "with", ja: "～と一緒に" },
+  { en: "say", ja: "（～と）言う" },
+  { en: "but", ja: "しかし" },
+  { en: "on", ja: "～（の上）に" },
+  { en: "want", ja: "～がほしい" },
+  { en: "when", ja: "いつ" },
+  { en: "there", ja: "そこに" },
+  { en: "this", ja: "これ" },
+  { en: "what", ja: "何" },
+  { en: "so", ja: "そんなに" },
+  { en: "from", ja: "～から" },
+  { en: "her", ja: "彼女の" },
+  { en: "his", ja: "彼の" },
+  { en: "think", ja: "（～と）思う" },
+  { en: "did", ja: "do / does の過去形" },
+  { en: "make", ja: "～をつくる" },
+  { en: "very", ja: "非常に" },
+  { en: "me", ja: "私を" },
+  { en: "like", ja: "～が好きである" },
+  { en: "see", ja: "～が見える" },
+  { en: "many", ja: "たくさんの" },
+  { en: "one", ja: "1つの" },
+  { en: "because", ja: "～なので" },
+  { en: "them", ja: "彼らを／彼女らを" },
+  { en: "be", ja: "be動詞の原形" },
+  { en: "some", ja: "いくつかの" },
+  { en: "how", ja: "どうやって" },
+  { en: "school", ja: "学校" },
+  { en: "time", ja: "時間" },
+  { en: "your", ja: "あなたの" },
+  { en: "know", ja: "（～を）知っている" },
+  { en: "am", ja: "～である" },
+  { en: "good", ja: "よい" },
+  { en: "get", ja: "～を得る" },
+  { en: "were", ja: "are の過去形" },
+  { en: "day", ja: "1日" },
+  { en: "more", ja: "より多くの" },
+  { en: "their", ja: "彼らの／彼女らの" },
+  { en: "thing", ja: "もの" },
+  { en: "use", ja: "～を使う" },
+  { en: "as", ja: "～のように" },
+  { en: "come", ja: "来る" },
+  { en: "other", ja: "ほかの" },
+  { en: "look", ja: "見る" },
+  { en: "take", ja: "～を取る" },
+  { en: "year", ja: "年" },
+  { en: "by", ja: "～で" },
+  { en: "our", ja: "私たちの" },
+  { en: "student", ja: "生徒" },
+  { en: "talk", ja: "話す" },
+  { en: "Mr.", ja: "～さん" },
+  { en: "all", ja: "全部の" },
+  { en: "English", ja: "英語" },
+  { en: "now", ja: "今" },
+  { en: "Japanese", ja: "日本語" },
+  { en: "find", ja: "～を見つける" },
+  { en: "if", ja: "もし～なら" },
+  { en: "tell", ja: "（～に）…を話す" },
+  { en: "him", ja: "彼を" },
+  { en: "yes", ja: "はい" },
+  { en: "after", ja: "～のあとに" },
+  { en: "work", ja: "働く" },
+  { en: "or", ja: "または～" },
+  { en: "who", ja: "だれ" },
+  { en: "Japan", ja: "日本" },
+  { en: "first", ja: "最初の" },
+  { en: "lot", ja: "たくさん" },
+  { en: "could", ja: "～することができた" },
+  { en: "then", ja: "そのとき" },
+  { en: "give", ja: "～を与える" },
+  { en: "learn", ja: "（～を）学ぶ" },
+  { en: "us", ja: "私たちを" },
+  { en: "help", ja: "（～を）助ける" },
+  { en: "also", ja: "～もまた" },
+  { en: "well", ja: "じょうずに" },
+  { en: "should", ja: "～すべきである" },
+  { en: "book", ja: "本" },
+  { en: "ask", ja: "（～に）…をたずねる" },
+  { en: "friend", ja: "友だち" },
+  { en: "play", ja: "（スポーツ）をする" },
+  { en: "than", ja: "～よりも" },
+  { en: "why", ja: "なぜ" },
+  { en: "too", ja: "～もまた" },
+  { en: "enjoy", ja: "～を楽しむ" },
+  { en: "study", ja: "（～を）勉強する" },
+  { en: "man", ja: "男の人" },
+  { en: "old", ja: "古い" },
+  { en: "no", ja: "少しも～ない" },
+  { en: "question", ja: "質問" },
+  { en: "way", ja: "道" },
+  { en: "country", ja: "国" },
+  { en: "two", ja: "2つの" },
+  { en: "next", ja: "次の" },
+  { en: "food", ja: "食べ物" },
+  { en: "become", ja: "～になる" },
+  { en: "try", ja: "（～を）試みる" },
+  { en: "read", ja: "（～を）読む" },
+  { en: "much", ja: "多量の" },
+  { en: "new", ja: "新しい" },
+  { en: "thank", ja: "～に感謝する" },
+  { en: "live", ja: "住む" },
+  { en: "start", ja: "始まる" },
+  { en: "happy", ja: "幸福な" },
+  { en: "right", ja: "右の" },
+  { en: "really", ja: "本当に" },
+  { en: "child", ja: "子ども" },
+  { en: "something", ja: "何か" },
+  { en: "world", ja: "世界" },
+  { en: "need", ja: "～を必要とする" },
+  { en: "important", ja: "重要な" },
+  { en: "long", ja: "長い" },
+  { en: "life", ja: "生命" },
+  { en: "eat", ja: "（～を）食べる" },
+  { en: "up", ja: "上へ" },
+  { en: "which", ja: "どちら" },
+  { en: "only", ja: "ただ1つの" },
+  { en: "visit", ja: "～を訪れる" },
+  { en: "show", ja: "（～に）…を見せる" },
+  { en: "mother", ja: "母（親）" },
+  { en: "every", ja: "どの～も" },
+  { en: "last", ja: "最後の" },
+  { en: "home", ja: "家庭" },
+  { en: "high", ja: "高い" },
+  { en: "before", ja: "～の前に" },
+  { en: "father", ja: "父（親）" },
+  { en: "picture", ja: "写真" },
+  { en: "hear", ja: "～が聞こえる" },
+  { en: "family", ja: "家族" },
+  { en: "buy", ja: "～を買う" },
+  { en: "place", ja: "場所" },
+  { en: "would", ja: "～だろう" },
+  { en: "different", ja: "違った" },
+  { en: "class", ja: "クラス／学級" },
+  { en: "these", ja: "これら" },
+  { en: "does", ja: "do の3人称単数現在" },
+  { en: "kind", ja: "親切な" },
+  { en: "house", ja: "家" },
+  { en: "hard", ja: "熱心に" },
+  { en: "idea", ja: "考え" },
+  { en: "oh", ja: "おお" },
+  { en: "write", ja: "（～を）書く" },
+  { en: "feel", ja: "（～を）感じる" },
+  { en: "woman", ja: "女の人" },
+  { en: "word", ja: "単語" },
+  { en: "around", ja: "～のまわりに" },
+  { en: "call", ja: "（～を）よぶ" },
+  { en: "today", ja: "今日（は）" },
+  { en: "here", ja: "ここに" },
+  { en: "just", ja: "ちょうど" },
+  { en: "better", ja: "よりよい" },
+  { en: "back", ja: "戻って" },
+  { en: "out", ja: "外へ" },
+  { en: "understand", ja: "（～を）理解する" },
+  { en: "each", ja: "それぞれの" },
+  { en: "please", ja: "どうぞ" },
+  { en: "Ms.", ja: "～さん" },
+  { en: "water", ja: "水" },
+  { en: "small", ja: "小さい" },
+  { en: "big", ja: "大きい" },
+  { en: "let（Let’s～）", ja: "～しよう" },
+  { en: "may", ja: "～してもよい" },
+  { en: "three", ja: "3つの" },
+  { en: "problem", ja: "問題" },
+  { en: "most", ja: "最も多くの" },
+  { en: "always", ja: "いつも" },
+  { en: "walk", ja: "歩く" },
+  { en: "great", ja: "すばらしい" },
+  { en: "answer", ja: "（～に）答える" },
+  { en: "teacher", ja: "先生" },
+  { en: "game", ja: "試合" },
+  { en: "again", ja: "再び" },
+  { en: "city", ja: "市" },
+  { en: "leave", ja: "（～を）去る" },
+  { en: "into", ja: "～の中へ" },
+  { en: "often", ja: "よく" },
+  { en: "speak", ja: "（～を）話す" },
+  { en: "watch", ja: "～を見る" },
+  { en: "keep", ja: "～を持ち続ける" },
+  { en: "same", ja: "同じ" },
+  { en: "week", ja: "週" },
+  { en: "change", ja: "～を変える" },
+  { en: "where", ja: "どこに" },
+  { en: "any", ja: "いくつかの" },
+  { en: "money", ja: "お金" },
+  { en: "morning", ja: "朝" },
+  { en: "beautiful", ja: "美しい" },
+  { en: "meet", ja: "（～に）会う" },
+  { en: "future", ja: "未来" },
+  { en: "animal", ja: "動物" },
+  { en: "interested", ja: "興味を持った" },
+  { en: "OK / O.K.", ja: "よろしい" },
+  { en: "name", ja: "名前" },
+  { en: "interesting", ja: "おもしろい" },
+  { en: "best", ja: "最もよい" },
+  { en: "difficult", ja: "難しい" },
+  { en: "little", ja: "小さい" },
+  { en: "example", ja: "例" },
+  { en: "room", ja: "部屋" },
+  { en: "job", ja: "仕事" },
+  { en: "stay", ja: "滞在する" },
+  { en: "put", ja: "～を置く" },
+  { en: "sure", ja: "確信して" },
+  { en: "never", ja: "決して～ない" },
+  { en: "together", ja: "一緒に" },
+  { en: "practice", ja: "（～を）練習する" },
+  { en: "another", ja: "別の" },
+  { en: "dog", ja: "イヌ" },
+  { en: "town", ja: "町" },
+  { en: "stop", ja: "～をやめる" },
+  { en: "mean", ja: "～を意味する" },
+  { en: "month", ja: "月" },
+  { en: "decide", ja: "（～を）決める" },
+  { en: "run", ja: "走る" },
+  { en: "clean", ja: "～をきれいにする" },
+  { en: "teach", ja: "（～に）…を教える" },
+  { en: "team", ja: "チーム" },
+  { en: "station", ja: "駅" },
+  { en: "young", ja: "若い" },
+  { en: "move", ja: "～を動かす" },
+  { en: "even", ja: "～でさえも" },
+  { en: "begin", ja: "始まる" },
+  { en: "hope", ja: "～を望む" },
+  { en: "join", ja: "～に参加する" },
+  { en: "over", ja: "～の上に" },
+  { en: "night", ja: "夜" },
+  { en: "experience", ja: "経験" },
+  { en: "been", ja: "be の過去分詞" },
+  { en: "remember", ja: "～を思い出す" },
+  { en: "bring", ja: "～を持ってくる" },
+  { en: "love", ja: "～を愛する" },
+  { en: "near", ja: "～の近くに" },
+  { en: "America", ja: "アメリカ" },
+  { en: "library", ja: "図書館" },
+  { en: "hi", ja: "やあ" },
+  { en: "ago", ja: "～の前に" },
+  { en: "park", ja: "公園" },
+  { en: "boy", ja: "男の子" },
+  { en: "shop", ja: "店" },
+  { en: "part", ja: "部分" },
+  { en: "nice", ja: "すてきな" },
+  { en: "club", ja: "クラブ" },
+  { en: "such", ja: "そのような" },
+  { en: "train", ja: "列車" },
+  { en: "member", ja: "一員" },
+  { en: "everyone", ja: "だれでも" },
+  { en: "sometimes", ja: "ときどき" },
+  { en: "during", ja: "～の間ずっと" },
+  { en: "grow", ja: "成長する" },
+  { en: "story", ja: "話" },
+  { en: "foreign", ja: "外国の" },
+  { en: "mountain", ja: "山" },
+  { en: "number", ja: "数" },
+  { en: "bus", ja: "バス" },
+  { en: "summer", ja: "夏" },
+  { en: "minute", ja: "分" },
+  { en: "easy", ja: "簡単な" },
+  { en: "still", ja: "まだ" },
+  { en: "listen", ja: "聞く" },
+  { en: "popular", ja: "人気のある" },
+  { en: "hour", ja: "1時間" },
+  { en: "sound", ja: "音" },
+  { en: "few（a few）", ja: "少数の" },
+  { en: "soon", ja: "まもなく" },
+  { en: "however", ja: "しかしながら" },
+  { en: "sleep", ja: "眠る" },
+  { en: "girl", ja: "女の子" },
+  { en: "down", ja: "下へ" },
+  { en: "course", ja: "進路" },
+  { en: "sorry", ja: "すまなく思って" },
+  { en: "festival", ja: "祭り" },
+  { en: "lunch", ja: "昼食" },
+  { en: "high school", ja: "高校" },
+  { en: "send", ja: "（～に）…を送る" },
+  { en: "surprised", ja: "驚いた" },
+  { en: "own", ja: "自分自身の" },
+  { en: "those", ja: "あれら／それら" },
+  { en: "scientist", ja: "科学者" },
+  { en: "later", ja: "より遅く" },
+  { en: "person", ja: "人" },
+  { en: "music", ja: "音楽" },
+  { en: "enough", ja: "十分な" },
+  { en: "brother", ja: "兄弟" },
+  { en: "usually", ja: "たいてい" },
+  { en: "away", ja: "離れて" },
+  { en: "believe", ja: "（～を）信じる" },
+  { en: "finish", ja: "～を終える" },
+  { en: "hand", ja: "手" },
+  { en: "light", ja: "明かり" },
+  { en: "through", ja: "～を通して" },
+  { en: "while", ja: "～する間に" },
+  { en: "without", ja: "～なしで" },
+  { en: "five", ja: "5つの" },
+  { en: "dream", ja: "夢" },
+  { en: "smile", ja: "ほほえむ" },
+  { en: "sport", ja: "スポーツ" },
+  { en: "car", ja: "車" },
+  { en: "earth", ja: "地球" },
+  { en: "movie", ja: "映画" },
+  { en: "letter", ja: "手紙" },
+  { en: "four", ja: "4つの" },
+  { en: "tree", ja: "木" },
+  { en: "happen", ja: "起こる" },
+  { en: "anything", ja: "何か" },
+  { en: "wait", ja: "待つ" },
+  { en: "parent", ja: "親" },
+  { en: "second", ja: "2番目の" },
+  { en: "open", ja: "～を開ける" },
+  { en: "player", ja: "競技者" },
+  { en: "able（be able to do）", ja: "～できる" },
+  { en: "its", ja: "それの" },
+  { en: "hello", ja: "こんにちは" },
+  { en: "museum", ja: "博物館" },
+  { en: "care", ja: "世話" },
+  { en: "language", ja: "言語" },
+  { en: "special", ja: "特別な" },
+  { en: "Australia", ja: "オーストラリア" },
+  { en: "information", ja: "情報" },
+  { en: "group", ja: "集団／グループ" },
+  { en: "must", ja: "～しなければならない" },
+  { en: "famous", ja: "有名な" },
+  { en: "tea", ja: "茶" },
+  { en: "sister", ja: "姉妹" },
+  { en: "large", ja: "大きい" },
+  { en: "soccer", ja: "サッカー" },
+  { en: "paper", ja: "紙" },
+  { en: "culture", ja: "文化" },
+  { en: "bad", ja: "悪い" },
+  { en: "hold", ja: "～を手に持つ" },
+  { en: "restaurant", ja: "レストラン" },
+  { en: "tomorrow", ja: "明日（は）" },
+  { en: "lose", ja: "～を失う" },
+  { en: "Sunday", ja: "日曜日" },
+  { en: "both", ja: "両方" },
+  { en: "bag", ja: "かばん" },
+  { en: "birthday", ja: "誕生日" },
+  { en: "wonderful", ja: "すばらしい" },
+  { en: "plant", ja: "植物" },
+  { en: "flower", ja: "花" },
+  { en: "front", ja: "前部" },
+  { en: "trip", ja: "旅行" },
+  { en: "yesterday", ja: "昨日（は）" },
+  { en: "someone", ja: "だれか" },
+  { en: "choose", ja: "（～を）選ぶ" },
+  { en: "space", ja: "空間" },
+  { en: "song", ja: "歌" },
+  { en: "volunteer", ja: "ボランティア" },
+  { en: "turn", ja: "～を回す" },
+  { en: "history", ja: "歴史" },
+  { en: "event", ja: "行事" },
+  { en: "travel", ja: "（～を）旅行する" },
+  { en: "bird", ja: "鳥" },
+  { en: "worry", ja: "心配する" },
+  { en: "favorite", ja: "お気に入りの" },
+  { en: "river", ja: "川" },
+  { en: "bike", ja: "自転車" },
+  { en: "early", ja: "早く" },
+  { en: "robot", ja: "ロボット" },
+  { en: "activity", ja: "活動" },
+  { en: "sit", ja: "すわる" },
+  { en: "drink", ja: "～を飲む" },
+  { en: "afternoon", ja: "午後" },
+  { en: "fast", ja: "速い" },
+  { en: "science", ja: "理科" },
+  { en: "grandfather", ja: "祖父" },
+  { en: "speech", ja: "スピーチ" },
+  { en: "sing", ja: "（～を）歌う" },
+  { en: "doctor", ja: "医者" },
+  { en: "since", ja: "～以来" },
+  { en: "strong", ja: "強い" },
+  { en: "sea", ja: "海" },
+  { en: "between", ja: "～の間に" },
+  { en: "useful", ja: "役に立つ" },
+  { en: "cannot", ja: "～することができない" },
+  { en: "sad", ja: "悲しい" },
+  { en: "company", ja: "会社" },
+  { en: "Saturday", ja: "土曜日" },
+  { en: "true", ja: "真実の" },
+  { en: "hospital", ja: "病院" },
+  { en: "point", ja: "点" },
+  { en: "party", ja: "パーティー" },
+  { en: "cook", ja: "（～を）料理する" },
+  { en: "human", ja: "人間の" },
+  { en: "agree", ja: "同意する" },
+  { en: "dinner", ja: "夕食" },
+  { en: "computer", ja: "コンピュータ" },
+  { en: "cold", ja: "寒い" },
+  { en: "table", ja: "テーブル" },
+  { en: "eye", ja: "目" },
+  { en: "win", ja: "（競技などに）勝つ" },
+  { en: "ten", ja: "10の" },
+  { en: "almost", ja: "ほとんど" },
+  { en: "TV", ja: "テレビ" },
+  { en: "build", ja: "～を建てる" },
+  { en: "fly", ja: "飛ぶ" },
+  { en: "tennis", ja: "テニス" },
+  { en: "wear", ja: "～を着ている" },
+  { en: "building", ja: "建物" },
+  { en: "sell", ja: "～を売る" },
+  { en: "off", ja: "離れて" },
+  { en: "American", ja: "アメリカ人" },
+  { en: "junior high school", ja: "中学校" },
+  { en: "homework", ja: "宿題" },
+  { en: "blue", ja: "青い" },
+  { en: "energy", ja: "力" },
+  { en: "program", ja: "番組" },
+  { en: "grandmother", ja: "祖母" },
+  { en: "glad", ja: "うれしい" },
+  { en: "plan", ja: "計画" },
+  { en: "classmates", ja: "クラスメイト" },
+  { en: "spend", ja: "（金銭）を使う" },
+  { en: "body", ja: "身体" },
+  { en: "color", ja: "色" },
+  { en: "internet", ja: "インターネット" },
+  { en: "break", ja: "～をこわす" },
+  { en: "until", ja: "～まで（ずっと）" },
+  { en: "fish", ja: "魚" },
+  { en: "message", ja: "伝言" },
+  { en: "mom", ja: "ママ" },
+  { en: "reason", ja: "理由" },
+  { en: "fun", ja: "楽しみ" },
+  { en: "carry", ja: "～を運ぶ" },
+  { en: "ever", ja: "かつて" },
+  { en: "chance", ja: "機会" },
+  { en: "green", ja: "緑色の" },
+  { en: "traditional", ja: "伝統的な" },
+  { en: "sick", ja: "病気の" },
+  { en: "box", ja: "箱" },
+  { en: "store", ja: "店" },
+  { en: "vacation", ja: "休暇" },
+  { en: "feeling", ja: "気持ち" },
+  { en: "warm", ja: "暖かい" },
+  { en: "white", ja: "白い" },
+  { en: "close", ja: "～を閉める" },
+  { en: "rain", ja: "雨が降る" },
+  { en: "street", ja: "通り" },
+  { en: "draw", ja: "（線で図や絵）を描く" },
+  { en: "machine", ja: "機械" },
+  { en: "yen", ja: "円" },
+  { en: "end", ja: "終わり" },
+  { en: "free", ja: "自由な" },
+  { en: "baby", ja: "赤ん坊" },
+  { en: "newspaper", ja: "新聞" },
+  { en: "under", ja: "～の真下に" },
+  { en: "door", ja: "ドア" },
+  { en: "forget", ja: "（～を）忘れる" },
+  { en: "present", ja: "贈り物" },
+  { en: "everything", ja: "何でも" },
+  { en: "face", ja: "顔" },
+  { en: "fall", ja: "落ちる" },
+  { en: "cat", ja: "ネコ" },
+  { en: "already", ja: "すでに" },
+  { en: "finally", ja: "ついに" },
+  { en: "actually", ja: "実際に" },
+  { en: "stand", ja: "立つ" },
+  { en: "village", ja: "村" },
+  { en: "graph", ja: "グラフ／図表" },
+  { en: "save", ja: "～を救う" },
+  { en: "shopping", ja: "買い物" },
+  { en: "red", ja: "赤い" },
+  { en: "winter", ja: "冬" },
+  { en: "phone", ja: "電話（機）" },
+  { en: "excited", ja: "興奮した" },
+  { en: "once", ja: "かつて" },
+  { en: "six", ja: "6つの" },
+  { en: "system", ja: "制度" },
+  { en: "cry", ja: "泣く" },
+  { en: "easily", ja: "簡単に" },
+  { en: "news", ja: "ニュース" },
+  { en: "afraid", ja: "恐れて" },
+  { en: "tired", ja: "疲れた" },
+  { en: "forest", ja: "森" },
+  { en: "math", ja: "数学" },
+  { en: "nature", ja: "自然" },
+  { en: "catch", ja: "～をつかまえる" },
+  { en: "baseball", ja: "野球" },
+  { en: "swim", ja: "泳ぐ" },
+  { en: "busy", ja: "忙しい" },
+  { en: "clothes", ja: "衣服" },
+  { en: "sun", ja: "太陽" },
+  { en: "explain", ja: "（～を）説明する" },
+  { en: "power", ja: "力" },
+  { en: "rule", ja: "規則" },
+  { en: "environment", ja: "環境" },
+  { en: "Canada", ja: "カナダ" },
+  { en: "nothing", ja: "何も～ない" },
+  { en: "star", ja: "星" },
+  { en: "welcome", ja: "ようこそ" },
+  { en: "continue", ja: "～を続ける" },
+  { en: "late", ja: "遅れた" },
+  { en: "farmer", ja: "農家（の人）" },
+  { en: "quickly", ja: "速く" },
+  { en: "thirty", ja: "30の" },
+  { en: "pay", ja: "（代金を）支払う" },
+  { en: "weekend", ja: "週末" },
+  { en: "air", ja: "空気" },
+  { en: "hot", ja: "暑い" },
+  { en: "bed", ja: "ベッド" },
+  { en: "dance", ja: "（～を）踊る" },
+  { en: "produce", ja: "～を生産する" },
+  { en: "area", ja: "地域" },
+  { en: "short", ja: "短い" },
+  { en: "art", ja: "芸術" },
+  { en: "arrive", ja: "到着する" },
+  { en: "university", ja: "（総合）大学" },
+  { en: "wow", ja: "わあ" },
+  { en: "fact", ja: "事実" },
+  { en: "angry", ja: "怒った" },
+  { en: "United States", ja: "アメリカ合衆国" },
+  { en: "black", ja: "黒い" },
+  { en: "mind", ja: "心" },
+  { en: "ball", ja: "ボール／球" },
+  { en: "basketball", ja: "バスケットボール" },
+  { en: "office", ja: "事務所" },
+  { en: "Mrs.", ja: "～さん" },
+  { en: "contest", ja: "コンテスト" },
+  { en: "e-mail", ja: "電子メール" },
+  { en: "vegetable", ja: "野菜" },
+  { en: "p.m. / P.M.", ja: "午後" },
+  { en: "die", ja: "死ぬ" },
+  { en: "far", ja: "遠い" },
+  { en: "cake", ja: "ケーキ" },
+  { en: "pass", ja: "～を手渡す" },
+  { en: "twenty", ja: "20の" },
+  { en: "share", ja: "～を共有する" },
+  { en: "rich", ja: "金持ちの" },
+  { en: "alone", ja: "ひとりきりの" },
+  { en: "sign", ja: "標識" },
+  { en: "third", ja: "3番目の" },
+  { en: "pet", ja: "ペット" },
+  { en: "ride", ja: "（乗り物に）乗る" },
+  { en: "map", ja: "地図" },
+  { en: "though", ja: "～だけれども" },
+  { en: "lesson", ja: "授業" },
+  { en: "meeting", ja: "会合" },
+  { en: "poor", ja: "貧しい" },
+  { en: "left", ja: "左" },
+  { en: "maybe", ja: "多分" },
+  { en: "difference", ja: "違い" },
+  { en: "o'clock", ja: "～時" },
+  { en: "son", ja: "息子" },
+  { en: "return", ja: "～を返す" },
+  { en: "Africa", ja: "アフリカ" },
+  { en: "hundred", ja: "100の" },
+  { en: "yet", ja: "まだ" },
+  { en: "abroad", ja: "外国へ" },
+  { en: "classroom", ja: "教室" },
+  { en: "road", ja: "道路" },
+  { en: "weather", ja: "天気" },
+  { en: "beach", ja: "浜辺" },
+  { en: "plane", ja: "飛行機" },
+  { en: "China", ja: "中国" },
+  { en: "exciting", ja: "興奮させる" },
+  { en: "cause", ja: "原因" },
+  { en: "rice", ja: "米" },
+  { en: "half", ja: "半分" },
+  { en: "tour", ja: "旅行" },
+  { en: "evening", ja: "夕方" },
+  { en: "host", ja: "（客をもてなす）主人" },
+  { en: "communication", ja: "コミュニケーション" },
+  { en: "farm", ja: "農場" },
+  { en: "goal", ja: "ゴール／目標" },
+  { en: "wrong", ja: "間違った" },
+  { en: "sky", ja: "空" },
+  { en: "moon", ja: "月" },
+  { en: "season", ja: "季節" },
+  { en: "test", ja: "試験" },
+  { en: "mistake", ja: "間違い" },
+  { en: "follow", ja: "～のあとについて行く" },
+  { en: "develop", ja: "～を発達させる" },
+  { en: "London", ja: "ロンドン" },
+  { en: "necessary", ja: "必要な" },
+  { en: "fine", ja: "元気な" },
+  { en: "less", ja: "より少ない" },
+  { en: "receive", ja: "～を受けとる" },
+  { en: "myself", ja: "私自身（を）" },
+  { en: "order", ja: "注文" },
+  { en: "seven", ja: "7つの" },
+  { en: "lake", ja: "湖" },
+  { en: "lie", ja: "横たわる" },
+  { en: "worker", ja: "働く人" },
+  { en: "concert", ja: "コンサート" },
+  { en: "outside", ja: "外側に" },
+  { en: "hall", ja: "会館" },
+  { en: "spring", ja: "春" },
+  { en: "card", ja: "カード" },
+  { en: "gift", ja: "贈り物" },
+  { en: "type", ja: "型" },
+  { en: "born", ja: "生まれる" },
+  { en: "suddenly", ja: "突然" },
+  { en: "window", ja: "窓" },
+  { en: "fruit", ja: "果物" },
+  { en: "among", ja: "～の間に" },
+  { en: "age", ja: "年齢" },
+  { en: "shall（Shall I ～?）", ja: "～しましょうか" },
+  { en: "health", ja: "健康" },
+  { en: "ground", ja: "地面" },
+  { en: "medicine", ja: "薬" },
+  { en: "piano", ja: "ピアノ" },
+  { en: "collect", ja: "～を集める" },
+  { en: "strange", ja: "奇妙な" },
+  { en: "technology", ja: "科学技術" },
+  { en: "eight", ja: "8つの" },
+  { en: "seem", ja: "～のように思われる" },
+  { en: "hit", ja: "（～を）打つ" },
+  { en: "side", ja: "側面" },
+  { en: "New York", ja: "ニューヨーク" },
+  { en: "dictionary", ja: "辞書" },
+  { en: "seat", ja: "座席" },
+  { en: "garden", ja: "庭" },
+  { en: "dangerous", ja: "危険な" },
+  { en: "laugh", ja: "笑う" },
+  { en: "design", ja: "設計" },
+  { en: "dark", ja: "暗い" },
+  { en: "gold", ja: "金" },
+  { en: "stone", ja: "石" },
+  { en: "visitor", ja: "訪問者" },
+  { en: "writer", ja: "作家" },
+  { en: "head", ja: "頭" },
+  { en: "land", ja: "陸地" },
+  { en: "done", ja: "do の過去分詞" },
+  { en: "brain", ja: "脳" },
+  { en: "else", ja: "そのほかに" },
+  { en: "top", ja: "頂上" },
+  { en: "cooking", ja: "料理" },
+  { en: "kite", ja: "凧" },
+  { en: "fight", ja: "（～と）戦う" },
+  { en: "elephant", ja: "ゾウ" },
+  { en: "line", ja: "線" },
+  { en: "daughter", ja: "娘" },
+  { en: "local", ja: "地元の" },
+  { en: "shoe", ja: "くつ" },
+  { en: "field", ja: "畑" },
+  { en: "piece", ja: "1個" },
+  { en: "Friday", ja: "金曜日" },
+  { en: "grandma", ja: "おばあちゃん" },
+  { en: "coffee", ja: "コーヒー" },
+  { en: "several", ja: "いくつかの" },
+  { en: "especially", ja: "特に" },
+  { en: "milk", ja: "牛乳" },
+  { en: "product", ja: "製品" },
+  { en: "zoo", ja: "動物園" },
+  { en: "uncle", ja: "おじ" },
+  { en: "century", ja: "世紀" },
+  { en: "floor", ja: "床" },
+  { en: "Chinese", ja: "中国語" },
+  { en: "check", ja: "～を照合する" },
+  { en: "natural", ja: "自然の" },
+  { en: "island", ja: "島" },
+  { en: "along", ja: "～に沿って" },
+  { en: "situation", ja: "状況" },
+  { en: "wall", ja: "壁" },
+  { en: "excuse", ja: "～を許す" },
+  { en: "wife", ja: "妻" },
+  { en: "expensive", ja: "高価な" },
+  { en: "forward", ja: "前方へ" },
+  { en: "himself", ja: "彼自身（を）" },
+  { en: "government", ja: "政府" },
+  { en: "carefully", ja: "注意深く" },
+  { en: "notice", ja: "～に気づく" },
+  { en: "wood", ja: "木材" },
+  { en: "tall", ja: "高い" },
+  { en: "garbage", ja: "生ごみ" },
+  { en: "possible", ja: "可能な" },
+  { en: "T-shirt", ja: "Tシャツ" },
+  { en: "paint", ja: "（～を）描く" },
+  { en: "report", ja: "報告" },
+  { en: "trouble", ja: "困難" },
+  { en: "pick", ja: "～を選ぶ" },
+  { en: "breakfast", ja: "朝食" },
+  { en: "wind", ja: "風" },
+  { en: "business", ja: "仕事" },
+  { en: "Olympic", ja: "オリンピックの" },
+  { en: "cool", ja: "涼しい" },
+  { en: "center", ja: "中心" },
+  { en: "hotel", ja: "ホテル" },
+  { en: "football", ja: "フットボール" },
+  { en: "cut", ja: "～を切る" },
+  { en: "cup", ja: "カップ" },
+  { en: "meaning", ja: "意味" },
+  { en: "real", ja: "本物の" },
+  { en: "safe", ja: "安全な" },
+  { en: "research", ja: "調査" },
+  { en: "dish", ja: "皿" },
+  { en: "imagine", ja: "（～を）想像する" },
+  { en: "inside", ja: "内側に" },
+  { en: "low", ja: "低い" },
+  { en: "realize", ja: "～に気づく" },
+  { en: "Monday", ja: "月曜日" },
+  { en: "borrow", ja: "～を借りる" },
+  { en: "anyone", ja: "だれか" },
+  { en: "create", ja: "～を創造する" },
+  { en: "careful", ja: "注意深い" },
+  { en: "owner", ja: "所有者" },
+  { en: "throw", ja: "（～を）投げる" },
+  { en: "calendar", ja: "カレンダー" },
+  { en: "gate", ja: "門" },
+  { en: "nurse", ja: "看護師" },
+  { en: "simple", ja: "簡単な" },
+  { en: "memory", ja: "記憶" },
+  { en: "tourist", ja: "観光客" },
+  { en: "ticket", ja: "切符" },
+  { en: "yourself", ja: "あなた自身（を）" },
+  { en: "support", ja: "～を支援する" },
+  { en: "project", ja: "計画" },
+  { en: "Europe", ja: "ヨーロッパ" },
+  { en: "ice", ja: "氷" },
+  { en: "coin", ja: "硬貨" },
+  { en: "prepare", ja: "（～の）準備をする" },
+  { en: "protect", ja: "～を保護する" },
+  { en: "horse", ja: "ウマ" },
+  { en: "May", ja: "5月" },
+  { en: "control", ja: "～を支配する" },
+  { en: "college", ja: "大学" },
+  { en: "aunt", ja: "おば" },
+  { en: "probably", ja: "たぶん" },
+  { en: "prize", ja: "賞" },
+  { en: "voice", ja: "声" },
+  { en: "nine", ja: "9つの" },
+  { en: "waste", ja: "～をむだにする" },
+  { en: "thousand", ja: "1000の" },
+  { en: "July", ja: "7月" },
+  { en: "heart", ja: "心臓" },
+  { en: "million", ja: "100万の" },
+  { en: "electricity", ja: "電気" },
+  { en: "theater", ja: "劇場" },
+  { en: "snow", ja: "雪" },
+  { en: "amount", ja: "量" },
+  { en: "insect", ja: "昆虫" },
+  { en: "slowly", ja: "ゆっくりと" },
+  { en: "improve", ja: "～を改良する" },
+  { en: "bottle", ja: "びん" },
+  { en: "full", ja: "いっぱいの" },
+  { en: "leg", ja: "脚" },
+  { en: "tooth", ja: "歯" },
+  { en: "heat", ja: "暑さ" },
+  { en: "instead", ja: "かわりに" },
+  { en: "themselves", ja: "彼ら自身（を）" },
+  { en: "drive", ja: "車で行く" },
+  { en: "elementary school", ja: "小学校" },
+  { en: "result", ja: "結果" },
+  { en: "marry", ja: "（～と）結婚する" },
+  { en: "opinion", ja: "意見" },
+  { en: "ready", ja: "準備ができた" },
+  { en: "healthy", ja: "健康な" },
+  { en: "desk", ja: "机" },
+  { en: "goodbye", ja: "さようなら" },
+  { en: "dad", ja: "パパ／お父さん" },
+  { en: "hungry", ja: "空腹な" },
+  { en: "customer", ja: "客" },
+  { en: "leader", ja: "指導者／リーダー" },
+  { en: "smartphone", ja: "スマートフォン" },
+  { en: "might", ja: "may の過去形" },
+  { en: "egg", ja: "卵" },
+  { en: "friendly", ja: "親しみやすい" },
+  { en: "kid", ja: "子ども" },
+  { en: "cherry", ja: "桜（の木）" },
+  { en: "cover", ja: "～をおおう" },
+  { en: "hamburger", ja: "ハンバーガー" },
+  { en: "behind", ja: "～の後ろに" },
+  { en: "wild", ja: "野生の" },
+  { en: "enter", ja: "～に入る" },
+  { en: "kill", ja: "～を殺す" },
+  { en: "guess", ja: "（～を）推測する" },
+  { en: "education", ja: "教育" },
+  { en: "orange", ja: "オレンジ" },
+  { en: "perfect", ja: "完全な" },
+  { en: "climb", ja: "（～に）登る" },
+  { en: "reach", ja: "～に着く" },
+  { en: "race", ja: "競走" },
+  { en: "social", ja: "社会の" },
+  { en: "solve", ja: "～を解決する" },
+  { en: "across", ja: "～を横切って" },
+  { en: "clear", ja: "はっきりした" },
+  { en: "August", ja: "8月" },
+  { en: "percent", ja: "パーセント" },
+  { en: "temple", ja: "寺院" },
+  { en: "cap", ja: "帽子" },
+  { en: "past", ja: "過去" },
+  { en: "temperature", ja: "温度" },
+  { en: "advice", ja: "忠告／アドバイス" },
+  { en: "nervous", ja: "緊張して" },
+  { en: "skill", ja: "技能" },
+  { en: "common", ja: "共通の" },
+  { en: "ceremony", ja: "式典" },
+  { en: "delicious", ja: "おいしい" },
+  { en: "subject", ja: "科目" },
+  { en: "exchange", ja: "～を交換する" },
+  { en: "sugar", ja: "砂糖" },
+  { en: "adult", ja: "大人" },
+  { en: "pen", ja: "ペン" },
+  { en: "notebook", ja: "ノート" },
+  { en: "wonder", ja: "～かしらと思う" },
+  { en: "communicate", ja: "コミュニケーションをとる" },
+  { en: "foot", ja: "足" },
+  { en: "smell", ja: "（～の）においがする" },
+  { en: "Dr.", ja: "～先生／～博士" },
+  { en: "international", ja: "国際的な" },
+  { en: "a.m. / A.M.", ja: "午前" },
+  { en: "against", ja: "～に反対して" },
+  { en: "reduce", ja: "～を減らす" },
+  { en: "stadium", ja: "競技場" },
+  { en: "discover", ja: "～を発見する" },
+  { en: "miss", ja: "～に乗り遅れる" },
+  { en: "size", ja: "大きさ" },
+  { en: "effect", ja: "効果" },
+  { en: "cow", ja: "牛" },
+  { en: "April", ja: "4月" },
+  { en: "set", ja: "～を定める" },
+  { en: "stage", ja: "舞台／ステージ" },
+  { en: "service", ja: "サービス／奉仕" },
+  { en: "satellite", ja: "衛星" },
+  { en: "hurt", ja: "～を傷つける" },
+  { en: "view", ja: "眺め" },
+  { en: "touch", ja: "～に触れる" },
+  { en: "introduce", ja: "～を紹介する" },
+  { en: "ring", ja: "～を鳴らす" },
+  { en: "police", ja: "警察" },
+  { en: "national", ja: "国家的な" },
+  { en: "salt", ja: "塩" },
+  { en: "invite", ja: "～を招く" },
+  { en: "plastic", ja: "プラスチック製の" },
+  { en: "lucky", ja: "運のよい" },
+  { en: "dry", ja: "乾いた" },
+  { en: "jump", ja: "とぶ" },
+  { en: "cell", ja: "細胞" },
+  { en: "March", ja: "3月" },
+  { en: "ski", ja: "スキーをする" },
+  { en: "sentence", ja: "文" },
+  { en: "print", ja: "～を印刷する" },
+  { en: "ocean", ja: "大洋" },
+  { en: "dollar", ja: "ドル" },
+  { en: "increase", ja: "増える" },
+  { en: "exercise", ja: "運動" },
+  { en: "captain", ja: "主将" },
+  { en: "volleyball", ja: "バレーボール" },
+  { en: "meat", ja: "肉" },
+  { en: "price", ja: "価格" },
+  { en: "distance", ja: "距離" },
+  { en: "bridge", ja: "橋" },
+  { en: "England", ja: "イングランド" },
+  { en: "lead", ja: "～を導く" },
+  { en: "moment", ja: "瞬間" },
+  { en: "hair", ja: "髪の毛" },
+  { en: "banana", ja: "バナナ" },
+  { en: "deep", ja: "深い" },
+  { en: "king", ja: "王" },
+  { en: "war", ja: "戦争" },
+  { en: "meal", ja: "食事" },
+  { en: "husband", ja: "夫" },
+  { en: "June", ja: "6月" },
+  { en: "taste", ja: "味" },
+  { en: "solar", ja: "太陽の" },
+  { en: "wash", ja: "（～を）洗う" },
+  { en: "photo", ja: "写真" },
+  { en: "Wednesday", ja: "水曜日" },
+  { en: "relax", ja: "くつろぐ" },
+  { en: "guide", ja: "～を案内する" },
+  { en: "camp", ja: "キャンプする" },
+  { en: "fire", ja: "火" },
+  { en: "serious", ja: "まじめな" },
+  { en: "India", ja: "インド" },
+  { en: "community", ja: "地域社会" },
+  { en: "fifteen", ja: "15の" },
+  { en: "period", ja: "期間" },
+  { en: "rock", ja: "岩" },
+  { en: "France", ja: "フランス" },
+  { en: "blood", ja: "血液" },
+  { en: "Christmas", ja: "クリスマス" },
+  { en: "kilometer", ja: "キロメートル" },
+  { en: "allow", ja: "～を許す" },
+  { en: "beginning", ja: "初め" },
+  { en: "fresh", ja: "新鮮な" },
+  { en: "marathon", ja: "マラソン" },
+  { en: "Tuesday", ja: "火曜日" },
+  { en: "symbol", ja: "象徴" },
+  { en: "apple", ja: "リンゴ" },
+  { en: "global", ja: "国際的な" },
+  { en: "fishing", ja: "釣り" },
+  { en: "October", ja: "10月" },
+  { en: "yellow", ja: "黄色の" },
+  { en: "researcher", ja: "調査員" },
+  { en: "main", ja: "主な" },
+  { en: "public", ja: "公の" },
+  { en: "article", ja: "記事" },
+  { en: "pull", ja: "（～を）引く" },
+  { en: "shape", ja: "形" },
+  { en: "straight", ja: "まっすぐに" },
+  { en: "ship", ja: "船" },
+  { en: "fifty", ja: "50の" },
+  { en: "September", ja: "9月" },
+  { en: "damage", ja: "損害" },
+  { en: "planet", ja: "惑星" },
+  { en: "professional", ja: "専門職の" },
+  { en: "elderly", ja: "年配の" },
+  { en: "cookie", ja: "クッキー" },
+  { en: "sweet", ja: "甘い" },
+  { en: "rose", ja: "バラ" },
+  { en: "chair", ja: "いす" },
+  { en: "disappear", ja: "消える" },
+  { en: "mine", ja: "私のもの" },
+  { en: "cute", ja: "かわいい" },
+  { en: "factory", ja: "工場" },
+  { en: "proud", ja: "誇りに思う" },
+  { en: "bicycle", ja: "自転車" },
+  { en: "Thursday", ja: "木曜日" },
+  { en: "dear", ja: "親愛なる" },
+  { en: "cost", ja: "（費用が）かかる" },
+  { en: "level", ja: "水準" },
+  { en: "juice", ja: "ジュース" },
+  { en: "cheap", ja: "安い" },
+  { en: "coat", ja: "上着" },
+  { en: "sunny", ja: "快晴の" },
+  { en: "arm", ja: "腕" },
+  { en: "video", ja: "ビデオ" },
+  { en: "flight", ja: "飛行便" },
+  { en: "corner", ja: "角" },
+  { en: "appear", ja: "現れる" },
+  { en: "add", ja: "～を加える" },
+  { en: "note", ja: "メモ" },
+  { en: "clock", ja: "時計" },
+  { en: "conversation", ja: "会話" },
+  { en: "bread", ja: "パン" },
+  { en: "encourage", ja: "～をはげます" },
+  { en: "law", ja: "法律" },
+  { en: "heavy", ja: "重い" },
+  { en: "tool", ja: "道具" },
+  { en: "teammate", ja: "チームメイト" },
+  { en: "rest", ja: "休憩" },
+  { en: "ancient", ja: "古代の" },
+  { en: "promise", ja: "約束" },
+  { en: "castle", ja: "城" },
+  { en: "treasure", ja: "宝物" },
+  { en: "astronaut", ja: "宇宙飛行士" },
+  { en: "step", ja: "一歩" },
+  { en: "code", ja: "符号" },
+  { en: "toward", ja: "～のほうへ" },
+  { en: "drop", ja: "落ちる" },
+  { en: "leaf", ja: "葉" },
+  { en: "clerk", ja: "店員" },
+  { en: "guitar", ja: "ギター" },
+  { en: "knowledge", ja: "知識" },
+  { en: "radio", ja: "ラジオ" },
+  { en: "perhaps", ja: "たぶん" },
+  { en: "living", ja: "生きている" },
+  { en: "quiet", ja: "静かな" },
+  { en: "express", ja: "～を表現する" },
+  { en: "dinosaur", ja: "恐竜" },
+  { en: "airport", ja: "空港" },
+  { en: "case", ja: "場合" },
+  { en: "whole", ja: "全体の" },
+  { en: "bookstore", ja: "書店" },
+  { en: "impress", ja: "～を感動させる" },
+  { en: "toy", ja: "おもちゃ" },
+  { en: "although", ja: "～だけれども" },
+  { en: "experiment", ja: "実験" },
+  { en: "effort", ja: "努力" },
+  { en: "movement", ja: "動作" },
+  { en: "choice", ja: "選択" },
+  { en: "supermarket", ja: "スーパーマーケット" },
+  { en: "mouth", ja: "口" },
+  { en: "nobody", ja: "だれもいない" },
+  { en: "society", ja: "社会" },
+  { en: "meter", ja: "メートル" },
+  { en: "either", ja: "（～か…）のどちらか" },
+  { en: "boat", ja: "ボート／船" },
+  { en: "staff", ja: "職員／スタッフ" },
+  { en: "sense", ja: "感覚" },
+  { en: "recycle", ja: "～を再利用する" },
+  { en: "soybean", ja: "大豆" },
+  { en: "shout", ja: "（～を）大声で叫ぶ" },
+  { en: "various", ja: "いろいろな" },
+  { en: "interest", ja: "興味" },
+  { en: "drum", ja: "たいこ／ドラム" },
+  { en: "soldier", ja: "軍人" },
+  { en: "slow", ja: "遅い" },
+  { en: "influence", ja: "影響" },
+  { en: "website", ja: "ウェブサイト" },
+  { en: "tomato", ja: "トマト" },
+  { en: "traffic", ja: "交通" },
+  { en: "steal", ja: "～を盗む" },
+  { en: "luck", ja: "運" },
+  { en: "deer", ja: "シカ" },
+  { en: "CD", ja: "コンパクトディスク" },
+  { en: "god", ja: "神" },
+  { en: "eleven", ja: "11の" },
+  { en: "aurora", ja: "オーロラ" },
+  { en: "fill", ja: "～を満たす" },
+  { en: "band", ja: "楽団" },
+  { en: "painting", ja: "絵" },
+  { en: "bank", ja: "銀行" },
+  { en: "stick", ja: "棒切れ" },
+  { en: "hat", ja: "帽子" },
+  { en: "quite", ja: "かなり" },
+  { en: "death", ja: "死" },
+  { en: "presentation", ja: "発表" },
+  { en: "page", ja: "ページ" },
+  { en: "market", ja: "市場" },
+  { en: "active", ja: "活動的な" },
+  { en: "date", ja: "日付" },
+  { en: "glass", ja: "ガラス／コップ" },
+  { en: "February", ja: "2月" },
+  { en: "New Zealand", ja: "ニュージーランド" },
+  { en: "middle", ja: "まん中" },
+  { en: "average", ja: "平均の" },
+  { en: "ability", ja: "能力" },
+  { en: "similar", ja: "似ている" },
+  { en: "action", ja: "行動" },
+  { en: "smart", ja: "りこうな" },
+  { en: "above", ja: "～の上に" },
+  { en: "matter", ja: "問題" },
+  { en: "twelve", ja: "12の" },
+  { en: "umbrella", ja: "かさ" },
+  { en: "lady", ja: "婦人" },
+  { en: "friendship", ja: "友情" },
+  { en: "desert", ja: "砂漠" },
+  { en: "disease", ja: "病気" },
+  { en: "bear", ja: "クマ" },
+  { en: "complete", ja: "～を完成する" },
+  { en: "doll", ja: "人形" },
+  { en: "tournament", ja: "トーナメント" },
+  { en: "hurry", ja: "急ぐ" },
+  { en: "herself", ja: "彼女自身" },
+  { en: "accident", ja: "事故" },
+  { en: "artist", ja: "芸術家" },
+  { en: "wish", ja: "願い" },
+  { en: "gym", ja: "体育館" },
+  { en: "schedule", ja: "予定／スケジュール" },
+  { en: "coach", ja: "監督／コーチ" },
+  { en: "gas", ja: "気体" },
+  { en: "data", ja: "データ／資料" },
+  { en: "north", ja: "北" },
+  { en: "chorus", ja: "合唱" },
+  { en: "puppy", ja: "子イヌ" },
+  { en: "terrible", ja: "恐ろしい" },
+  { en: "fear", ja: "恐れ" },
+  { en: "raise", ja: "～を上げる" },
+  { en: "record", ja: "記録" },
+  { en: "wake", ja: "目がさめる" },
+  { en: "position", ja: "位置" },
+  { en: "clearly", ja: "はっきりと" },
+  { en: "twice", ja: "2度" },
+  { en: "December", ja: "12月" },
+  { en: "list", ja: "一覧表／リスト" },
+  { en: "pollution", ja: "汚染" },
+  { en: "site", ja: "用地" },
+  { en: "usual", ja: "いつもの" },
+  { en: "yours", ja: "あなたのもの" },
+  { en: "camera", ja: "カメラ" },
+  { en: "least", ja: "最も少ない" },
+  { en: "dead", ja: "死んでいる" },
+  { en: "bath", ja: "入浴" },
+  { en: "shy", ja: "内気な" },
+  { en: "January", ja: "1月" },
+  { en: "repair", ja: "～を修理する" },
+  { en: "roll", ja: "～をころがす" },
+  { en: "British", ja: "イギリスの" },
+  { en: "serve", ja: "（食事を）出す" },
+  { en: "someday", ja: "いつか" },
+  { en: "everyday", ja: "毎日の" },
+  { en: "respect", ja: "～を尊敬する" },
+  { en: "south", ja: "南" },
+  { en: "forty", ja: "40の" },
+  { en: "textbook", ja: "教科書" },
+  { en: "comic", ja: "マンガ" },
+  { en: "act", ja: "行動する" },
+  { en: "fan", ja: "ファン" },
+  { en: "tonight", ja: "今夜" },
+  { en: "holiday", ja: "休日" },
+  { en: "chocolate", ja: "チョコレート" },
+  { en: "post office", ja: "郵便局" },
+  { en: "form", ja: "形" },
+  { en: "teenager", ja: "ティーンエージャー" },
+  { en: "bee", ja: "ハチ" },
+  { en: "turtle", ja: "カメ" },
+  { en: "push", ja: "（～を）押す" },
+  { en: "shock", ja: "～に衝撃を与える" },
+  { en: "bright", ja: "輝く" },
+  { en: "connect", ja: "～をつなぐ" },
+  { en: "invent", ja: "～を発明する" },
+  { en: "noise", ja: "物音" },
+  { en: "training", ja: "訓練" },
+  { en: "object", ja: "物体" },
+  { en: "chart", ja: "図表" },
+  { en: "funny", ja: "おもしろい" },
+  { en: "billion", ja: "10億の" },
+  { en: "modern", ja: "現代の" },
+  { en: "speaker", ja: "演説者" },
+  { en: "weak", ja: "弱い" },
+  { en: "fourth", ja: "4番目の" },
+  { en: "Asia", ja: "アジア" },
+  { en: "grade", ja: "学年" },
+  { en: "certain", ja: "確かな" },
+  { en: "patient", ja: "忍耐強い" },
+  { en: "ink", ja: "インク" },
+  { en: "gather", ja: "～を集める" },
+  { en: "hole", ja: "穴" },
+  { en: "truth", ja: "真実" },
+  { en: "wrap", ja: "～を包む" },
+  { en: "relationship", ja: "関係" },
+  { en: "rainy", ja: "雨の" },
+  { en: "firework", ja: "花火" },
+  { en: "percentage", ja: "割合／パーセンテージ" },
+  { en: "amazing", ja: "びっくりするような" },
+  { en: "ear", ja: "耳" },
+  { en: "impossible", ja: "不可能な" },
+  { en: "round", ja: "丸い" },
+  { en: "wave", ja: "波" },
+  { en: "peace", ja: "平和" },
+  { en: "shirt", ja: "シャツ" },
+  { en: "accept", ja: "～を受け入れる" },
+  { en: "condition", ja: "状態" },
+  { en: "dress", ja: "～に服を着せる" },
+  { en: "expect", ja: "～を期待する" },
+  { en: "following", ja: "次の" },
+  { en: "November", ja: "11月" },
+  { en: "decision", ja: "決定" },
+  { en: "runner", ja: "走る人／ランナー" },
+  { en: "ant", ja: "アリ" },
+  { en: "purpose", ja: "目的" },
+  { en: "fat", ja: "太った" },
+  { en: "figure", ja: "図表" },
+  { en: "cancer", ja: "がん" },
+  { en: "preserve", ja: "～を保護する" },
+  { en: "pocket", ja: "ポケット" },
+  { en: "engineer", ja: "技師／エンジニア" },
+  { en: "importance", ja: "重要性" },
+  { en: "interview", ja: "インタビュー／面接" },
+  { en: "intelligence", ja: "知能" },
+  { en: "lamp", ja: "明かり" },
+  { en: "task", ja: "仕事" },
+  { en: "pencil", ja: "鉛筆" },
+  { en: "blind", ja: "目の見えない" },
+  { en: "spread", ja: "～を広げる" },
+  { en: "generation", ja: "世代" },
+  { en: "pot", ja: "つぼ" },
+  { en: "pump", ja: "～をポンプでくみ出す" },
+  { en: "cheer", ja: "（～を）応援する" },
+  { en: "metal", ja: "金属" },
+  { en: "driver", ja: "運転手" },
+  { en: "hide", ja: "隠れる" },
+  { en: "department store", ja: "デパート／百貨店" },
+  { en: "telephone", ja: "電話" },
+  { en: "uniform", ja: "制服／ユニフォーム" },
+  { en: "lion", ja: "ライオン" },
+  { en: "stamp", ja: "切手" },
+  { en: "convenient", ja: "便利な" },
+  { en: "pretty", ja: "かわいらしい" },
+  { en: "daily", ja: "日常の" },
+  { en: "depend", ja: "頼る" },
+  { en: "magazine", ja: "雑誌" },
+  { en: "state", ja: "州" },
+  { en: "thought", ja: "思考" },
+  { en: "church", ja: "教会" },
+  { en: "whose", ja: "だれのもの" },
+  { en: "helpful", ja: "役に立つ" },
+  { en: "style", ja: "様式" },
+  { en: "athlete", ja: "運動選手" },
+  { en: "performance", ja: "上演" },
+  { en: "secret", ja: "秘密の" },
+  { en: "silver", ja: "銀" },
+  { en: "Brazil", ja: "ブラジル" },
+  { en: "mobile phone", ja: "携帯電話" },
+  { en: "selfish", ja: "利己的な" },
+  { en: "lily", ja: "ユリ" },
+  { en: "taxi", ja: "タクシー" },
+  { en: "bowl", ja: "ボウル／どんぶり" },
+  { en: "French", ja: "フランス語" },
+  { en: "skin", ja: "皮ふ" },
+  { en: "wing", ja: "翼" },
+  { en: "invention", ja: "発明" },
+  { en: "cross", ja: "～を横切る" },
+  { en: "whether", ja: "～かどうか" },
+    { en: "Mars", ja: "火星" },
+  { en: "stress", ja: "ストレス" },
+  { en: "east", ja: "東" },
+  { en: "boring", ja: "たいくつな" },
+  { en: "everybody", ja: "だれでも" },
+  { en: "role", ja: "役割" },
+  { en: "pizza", ja: "ピザ" },
+  { en: "homestay", ja: "ホームステイ" },
+  { en: "kitchen", ja: "台所" },
+  { en: "recently", ja: "最近" },
+  { en: "wedding", ja: "結婚式" },
+  { en: "safety", ja: "安全" },
+  { en: "sightseeing", ja: "観光" },
+  { en: "sandwich", ja: "サンドイッチ" },
+  { en: "tear", ja: "涙" },
+  { en: "nose", ja: "鼻" },
+  { en: "key", ja: "かぎ" },
+  { en: "bell", ja: "鐘" },
+  { en: "custom", ja: "習慣" },
+  { en: "Hawaii", ja: "ハワイ" },
+  { en: "offer", ja: "申し出る" },
+  { en: "rise", ja: "昇る" },
+  { en: "atmosphere", ja: "大気" },
+  { en: "chemical", ja: "化学の" },
+  { en: "cloud", ja: "雲" },
+  { en: "western", ja: "西の" },
+  { en: "attention", ja: "注意" },
+  { en: "earthquake", ja: "地震" },
+  { en: "graduate", ja: "卒業する" },
+  { en: "process", ja: "過程" },
+  { en: "sleepy", ja: "眠い" },
+  { en: "survive", ja: "（～を）生き残る" },
+  { en: "shoot", ja: "（～を）撃つ" },
+  { en: "speed", ja: "速度" },
+  { en: "bone", ja: "骨" },
+  { en: "Britain", ja: "イギリス" },
+  { en: "seed", ja: "種" },
+  { en: "singer", ja: "歌手" },
+  { en: "Sydney", ja: "シドニー" },
+  { en: "expression", ja: "表現" },
+  { en: "quietly", ja: "静かに" },
+  { en: "search", ja: "（～を）さがす" },
+  { en: "shake", ja: "～を振る" },
+  { en: "California", ja: "カリフォルニア州" },
+  { en: "character", ja: "登場人物" },
+  { en: "destroy", ja: "～を破壊する" },
+  { en: "material", ja: "原料" },
+  { en: "means", ja: "方法" },
+  { en: "rate", ja: "割合" },
+  { en: "mark", ja: "～に印をつける" },
+  { en: "release", ja: "～を解放する" },
+  { en: "shrine", ja: "神社" },
+  { en: "tradition", ja: "伝統" },
+  { en: "burn", ja: "燃える" },
+  { en: "magic", ja: "魔法" },
+  { en: "queen", ja: "女王" },
+  { en: "sheet", ja: "1枚" },
+  { en: "hunter", ja: "猟師" },
+  { en: "dirty", ja: "よごれた" },
+  { en: "happiness", ja: "幸福" },
+  { en: "joy", ja: "喜び" },
+  { en: "guest", ja: "客" },
+  { en: "officer", ja: "役人" },
+  { en: "bean", ja: "豆" },
+  { en: "enemy", ja: "敵" },
+  { en: "user", ja: "使用者" },
+  { en: "import", ja: "～を輸入する" },
+  { en: "sheep", ja: "ヒツジ" },
+  { en: "council", ja: "協議会" },
+  { en: "per", ja: "～につき" },
+  { en: "soup", ja: "スープ" },
+  { en: "surface", ja: "表面" },
+  { en: "west", ja: "西" },
+  { en: "correct", ja: "正確な" },
+  { en: "Korea", ja: "韓国" },
+  { en: "normal", ja: "標準の" },
+  { en: "toilet", ja: "トイレ" },
+  { en: "artificial", ja: "人工の" },
+  { en: "expert", ja: "専門家" },
+  { en: "vending machine", ja: "自動販売機" },
+  { en: "entrance", ja: "入口" },
+  { en: "actor", ja: "俳優" },
+  { en: "earn", ja: "～を得る" },
+  { en: "wide", ja: "広い" },
+  { en: "successful", ja: "成功した" },
+  { en: "thin", ja: "薄い" },
+  { en: "topic", ja: "話題" },
+  { en: "unique", ja: "独特の" },
+  { en: "convenience store", ja: "コンビニエンスストア" },
+  { en: "reply", ja: "答える" },
+  { en: "koala", ja: "コアラ" },
+  { en: "poster", ja: "ポスター" },
+  { en: "penguin", ja: "ペンギン" },
+  { en: "railway", ja: "鉄道" },
+  { en: "ballet", ja: "バレエ" },
+  { en: "anyway", ja: "とにかく" },
+  { en: "neighbor", ja: "隣人" },
+  { en: "pain", ja: "痛み" },
+  { en: "understanding", ja: "理解" },
+  { en: "count", ja: "（～を）数える" },
+  { en: "feed", ja: "～に食べ物を与える" },
+  { en: "musician", ja: "音楽家" },
+  { en: "breath", ja: "呼吸" },
+  { en: "circle", ja: "円" },
+  { en: "president", ja: "大統領" },
+  { en: "cloudy", ja: "くもりの" },
+  { en: "popcorn", ja: "ポップコーン" },
+  { en: "Germany", ja: "ドイツ" },
+  { en: "potato", ja: "ジャガイモ" },
+  { en: "addition", ja: "加えること" },
+  { en: "address", ja: "住所" },
+  { en: "hate", ja: "～をにくむ" },
+  { en: "pressure", ja: "重圧" },
+  { en: "scare", ja: "～を怖がらせる" },
+  { en: "challenge", ja: "挑戦" },
+  { en: "soft", ja: "やわらかい" },
+  { en: "survey", ja: "調査" },
+  { en: "huge", ja: "巨大な" },
+  { en: "lifestyle", ja: "生活様式" },
+  { en: "ordinary", ja: "通常の" },
+  { en: "perform", ja: "～を上演する" },
+  { en: "wallet", ja: "さいふ" },
+  { en: "beef", ja: "牛肉" },
+  { en: "fossil", ja: "化石" },
+  { en: "wise", ja: "賢い" },
+  { en: "blossom", ja: "花" },
+  { en: "rugby", ja: "ラグビー" },
+  { en: "rope", ja: "なわ" },
+  { en: "heritage", ja: "遺産" },
+  { en: "leaflet", ja: "ちらし" },
+  { en: "clever", ja: "りこうな" },
+  { en: "grass", ja: "草" },
+  { en: "seventy", ja: "70の" },
+  { en: "shine", ja: "輝く" },
+  { en: "surprise", ja: "～を驚かせる" },
+  { en: "device", ja: "装置" },
+  { en: "fry", ja: "～を油で揚げる" },
+  { en: "anger", ja: "怒り" },
+  { en: "completely", ja: "完全に" },
+  { en: "passenger", ja: "乗客" },
+  { en: "competition", ja: "競争" },
+  { en: "mouse", ja: "ハツカネズミ" },
+  { en: "loud", ja: "大きい" },
+  { en: "attack", ja: "～を攻撃する" },
+  { en: "airplane", ja: "飛行機" },
+  { en: "exactly", ja: "正確に" },
+  { en: "theory", ja: "理論" },
+  { en: "bottom", ja: "底" },
+  { en: "suffer", ja: "～を受ける" },
+  { en: "bacteria", ja: "バクテリア／細菌" },
+  { en: "professor", ja: "教授" },
+  { en: "tunnel", ja: "トンネル" },
+  { en: "swallow", ja: "ツバメ" },
+  { en: "empty", ja: "からの" },
+  { en: "fix", ja: "～を修理する" },
+  { en: "worse", ja: "より悪い" },
+  { en: "affect", ja: "～に影響する" },
+  { en: "comfortable", ja: "気持ちのよい" },
+  { en: "phrase", ja: "句" },
+  { en: "discovery", ja: "発見" },
+  { en: "advertisement", ja: "広告" },
+  { en: "focus", ja: "焦点" },
+  { en: "master", ja: "～を習得する" },
+  { en: "elevator", ja: "エレベーター" },
+  { en: "pound", ja: "ポンド" },
+  { en: "pop", ja: "大衆向けの" },
+  { en: "trick", ja: "手品" },
+  { en: "plain", ja: "わかりやすい" },
+  { en: "shell", ja: "貝がら" },
+  { en: "tower", ja: "塔" },
+  { en: "oil", ja: "石油" },
+  { en: "asleep", ja: "眠って" },
+  { en: "silent", ja: "沈黙の" },
+  { en: "calm", ja: "おだやかな" },
+  { en: "behavior", ja: "ふるまい" },
+  { en: "source", ja: "みなもと" },
+  { en: "provide", ja: "～を与える" },
+  { en: "passage", ja: "通路" },
+  { en: "fisherman", ja: "漁師" },
+  { en: "necklace", ja: "ネックレス" },
+  { en: "powder", ja: "粉" },
+  { en: "Berlin", ja: "ベルリン" },
+  { en: "somewhere", ja: "どこかに" },
+  { en: "surprising", ja: "驚くべき" },
+  { en: "crop", ja: "農作物" },
+  { en: "powerful", ja: "強力な" },
+  { en: "regular", ja: "規則正しい" },
+  { en: "African", ja: "アフリカの" },
+  { en: "hill", ja: "丘" },
+  { en: "anymore", ja: "これ以上" },
+  { en: "balance", ja: "つりあい" },
+  { en: "success", ja: "成功" },
+  { en: "smoke", ja: "煙" },
+  { en: "Antarctica", ja: "南極大陸" },
+  { en: "skate", ja: "スケートをする" },
+  { en: "vote", ja: "（～に）投票する" },
+  { en: "bride", ja: "花嫁" },
+  { en: "wheelchair", ja: "車いす" },
+  { en: "cousin", ja: "いとこ" },
+  { en: "disappointed", ja: "がっかりして" },
+  { en: "pair", ja: "一対" },
+  { en: "pink", ja: "ピンク色の" },
+  { en: "square", ja: "正方形" },
+  { en: "development", ja: "発展" },
+  { en: "gesture", ja: "身ぶり／ジェスチャー" },
+  { en: "partner", ja: "パートナー" },
+  { en: "personal", ja: "個人の" },
+  { en: "Singapore", ja: "シンガポール" },
+  { en: "pond", ja: "池" },
+  { en: "sail", ja: "帆" },
+  { en: "zone", ja: "地帯" },
+  { en: "logic", ja: "論理" },
+  { en: "injure", ja: "～にけがをさせる" },
+  { en: "sixty", ja: "60の" },
+  { en: "below", ja: "～の下に" },
+  { en: "finger", ja: "指" },
+  { en: "noon", ja: "正午" },
+  { en: "electric", ja: "電気の" },
+  { en: "everywhere", ja: "どこでも" },
+  { en: "relate", ja: "～を関係づける" },
+  { en: "wet", ja: "ぬれた" },
+  { en: "disaster", ja: "大災害" },
+  { en: "original", ja: "もとの" },
+  { en: "panda", ja: "パンダ" },
+  { en: "rabbit", ja: "ウサギ" },
+  { en: "racket", ja: "ラケット" },
+  { en: "score", ja: "得点／スコア" },
+  { en: "apply", ja: "申しこむ" },
+  { en: "manner", ja: "行儀" },
+  { en: "pool", ja: "プール" },
+  { en: "cage", ja: "鳥かご" },
+  { en: "creative", ja: "創造的な" },
+  { en: "sale", ja: "販売" },
+  { en: "trash", ja: "くず" },
+  { en: "therapy", ja: "治療／セラピー" },
+  { en: "author", ja: "著者" },
+  { en: "happily", ja: "幸福に" },
+  { en: "direction", ja: "方向" },
+  { en: "sand", ja: "砂" },
+  { en: "total", ja: "全体の" },
+  { en: "brown", ja: "茶色の" },
+  { en: "courage", ja: "勇気" },
+  { en: "drama", ja: "演劇" },
+  { en: "housework", ja: "家事" },
+  { en: "mix", ja: "～をまぜる" },
+  { en: "trust", ja: "～を信用する" },
+  { en: "bite", ja: "ひと口" },
+  { en: "economy", ja: "経済" },
+  { en: "medical", ja: "医学の" },
+  { en: "polite", ja: "ていねいな" },
+  { en: "curry", ja: "カレー料理" },
+  { en: "female", ja: "女性" },
+  { en: "interviewer", ja: "インタビューする人" },
+  { en: "fuel", ja: "燃料" },
+  { en: "cave", ja: "洞くつ" },
+  { en: "gun", ja: "銃" },
+  { en: "shark", ja: "サメ" },
+  { en: "originally", ja: "本来" },
+  { en: "forever", ja: "永久に" },
+  { en: "track", ja: "トラック" },
+  { en: "mile", ja: "マイル" },
+  { en: "thick", ja: "厚い" },
+  { en: "homeroom", ja: "ホームルーム" },
+  { en: "United Kingdom", ja: "イギリス" },
+  { en: "value", ja: "価値" },
+  { en: "charity", ja: "慈善" },
+  { en: "rescue", ja: "～を救助する" },
+  { en: "stranger", ja: "見知らぬ人" },
+  { en: "gray", ja: "灰色の" },
+  { en: "quarter", ja: "4分の1" },
+  { en: "scissors", ja: "はさみ" },
+  { en: "crow", ja: "カラス" },
+  { en: "comma", ja: "コンマ" },
+  { en: "trade", ja: "貿易" },
+  { en: "weight", ja: "重さ" },
+  { en: "celebrate", ja: "～を祝う" },
+  { en: "deliver", ja: "～を配達する" },
+  { en: "Paris", ja: "パリ" },
+  { en: "suggest", ja: "～を提案する" },
+  { en: "dig", ja: "～を掘る" },
+  { en: "shift", ja: "変わる" },
+  { en: "storm", ja: "嵐" },
+  { en: "prefecture", ja: "県" },
+  { en: "tail", ja: "尾" },
+  { en: "couple", ja: "夫婦" },
+  { en: "cicada", ja: "セミ" },
+  { en: "fifth", ja: "5番目の" },
+  { en: "spot", ja: "場所" },
+  { en: "base", ja: "基礎" },
+  { en: "habit", ja: "習慣" },
+  { en: "central", ja: "中央の" },
+  { en: "comment", ja: "論評" },
+  { en: "intelligent", ja: "知能の高い" },
+  { en: "knife", ja: "ナイフ" },
+  { en: "Miss", ja: "～さん" },
+  { en: "remain", ja: "～のままである" },
+  { en: "Roman", ja: "ローマの" },
+  { en: "chain", ja: "鎖／チェーン" },
+  { en: "dolphin", ja: "イルカ" },
+  { en: "private", ja: "個人的な" },
+  { en: "album", ja: "アルバム" },
+  { en: "dancer", ja: "ダンサー" },
+  { en: "ghost", ja: "幽霊" },
+  { en: "merchant", ja: "商人" },
+  { en: "Venus", ja: "金星" },
+  { en: "kitten", ja: "子ネコ" },
+  { en: "rain forest", ja: "熱帯雨林" },
+  { en: "yeah", ja: "はい" },
+  { en: "Spanish", ja: "スペイン語" },
+  { en: "crowded", ja: "混みあった" },
+  { en: "beat", ja: "～を打ち負かす" },
+  { en: "belong", ja: "所属する" },
+  { en: "certainly", ja: "確かに" },
+  { en: "bit", ja: "少し" },
+  { en: "compare", ja: "～を比較する" },
+  { en: "board", ja: "板" },
+  { en: "Italy", ja: "イタリア" },
+  { en: "nest", ja: "巣" },
+  { en: "positive", ja: "積極的な" },
+  { en: "postcard", ja: "はがき" },
+  { en: "spirit", ja: "精神" },
+  { en: "separate", ja: "～を分ける" },
+  { en: "succeed", ja: "成功する" },
+  { en: "cure", ja: "～を治す" },
+  { en: "image", ja: "印象" },
+  { en: "novel", ja: "小説" },
+  { en: "sight", ja: "視力" },
+  { en: "danger", ja: "危険" },
+  { en: "loss", ja: "損失" },
+  { en: "slave", ja: "奴隷" },
+  { en: "theme", ja: "主題／テーマ" },
+  { en: "risk", ja: "危険性" },
+  { en: "camel", ja: "ラクダ" },
+  { en: "anywhere", ja: "どこかへ" },
+  { en: "attract", ja: "～をひきつける" },
+  { en: "brush", ja: "～をみがく" },
+  { en: "repeat", ja: "くり返して言う" },
+  { en: "engine", ja: "エンジン" },
+  { en: "cloth", ja: "布" },
+  { en: "sunlight", ja: "日光" },
+  { en: "mystery", ja: "なぞ" },
+  { en: "nut", ja: "木の実" },
+  { en: "bulb", ja: "電球" },
+  { en: "principal", ja: "校長" },
+  { en: "calculate", ja: "～を計算する" },
+  { en: "colony", ja: "植民地" },
+  { en: "menu", ja: "メニュー" },
+  { en: "lift", ja: "～を持ち上げる" },
+  { en: "Asian", ja: "アジアの" },
+  { en: "Australian", ja: "オーストラリアの" },
+  { en: "cultural", ja: "文化の" },
+  { en: "directly", ja: "直接に" },
+  { en: "neck", ja: "首" },
+  { en: "block", ja: "区画／ブロック" },
+  { en: "golden", ja: "金色の" },
+  { en: "hometown", ja: "生まれ故郷" },
+  { en: "beauty", ja: "美しさ" },
+  { en: "collection", ja: "収集" },
+  { en: "hunt", ja: "～を狩る" },
+  { en: "limit", ja: "限度" },
+  { en: "nearly", ja: "ほとんど" },
+  { en: "pack", ja: "～をつめこむ" },
+  { en: "agriculture", ja: "農業" },
+  { en: "diary", ja: "日記" },
+  { en: "impact", ja: "衝撃" },
+  { en: "media", ja: "マスメディア" },
+  { en: "painter", ja: "画家" },
+  { en: "panel", ja: "パネル" },
+  { en: "web", ja: "ウェブ" },
+  { en: "assistance", ja: "援助" },
+  { en: "onto", ja: "～の上に" },
+  { en: "therefore", ja: "したがって" },
+  { en: "slide", ja: "すべる" },
+  { en: "text", ja: "本文" },
+  { en: "film", ja: "映画" },
+  { en: "Finland", ja: "フィンランド" },
+  { en: "major", ja: "主要な" },
+  { en: "cafeteria", ja: "カフェテリア" },
+  { en: "satisfy", ja: "～を満足させる" },
+  { en: "climate", ja: "気候" },
+  { en: "kick", ja: "～をける" },
+  { en: "shoulder", ja: "肩" },
+  { en: "towel", ja: "タオル" },
+  { en: "alive", ja: "生きている" },
+  { en: "basic", ja: "基本的な" },
+  { en: "extra", ja: "余分の" },
+  { en: "foreigner", ja: "外国人" },
+  { en: "avoid", ja: "～を避ける" },
+  { en: "European", ja: "ヨーロッパ人" },
+  { en: "unhappy", ja: "不幸な" },
+  { en: "breathe", ja: "呼吸する" },
+  { en: "physical", ja: "身体の" },
+  { en: "sixteen", ja: "16の" },
+  { en: "traveler", ja: "旅行者" },
+  { en: "violin", ja: "バイオリン" },
+  { en: "yard", ja: "庭" },
+  { en: "connection", ja: "つながり" },
+  { en: "exam", ja: "試験" },
+  { en: "fortune", ja: "運" },
+  { en: "monkey", ja: "サル" },
+  { en: "male", ja: "男性" },
+  { en: "online", ja: "オンラインの" },
+  { en: "safely", ja: "安全に" },
+  { en: "campaign", ja: "宣伝活動／キャンペーン" },
+  { en: "region", ja: "地域" },
+  { en: "exhibition", ja: "展覧会" },
+  { en: "force", ja: "力" },
+  { en: "sticky", ja: "ねばねばした" },
+  { en: "grandparent", ja: "祖父／祖母" },
+  { en: "cream", ja: "クリーム" },
+  { en: "knock", ja: "ノックする" },
+  { en: "wooden", ja: "木の" },
+  { en: "plate", ja: "皿" },
+  { en: "thirteen", ja: "13の" },
+  { en: "winner", ja: "勝利者" },
+  { en: "explanation", ja: "説明" },
+  { en: "hero", ja: "ヒーロー／英雄" },
+  { en: "environmental", ja: "環境の" },
+  { en: "escape", ja: "逃げる" },
+  { en: "tiny", ja: "とても小さい" },
+  { en: "benefit", ja: "利益" },
+  { en: "fail", ja: "失敗する" },
+  { en: "pilot", ja: "パイロット" },
+  { en: "rather", ja: "かなり" },
+  { en: "route", ja: "道筋" },
+  { en: "sensor", ja: "センサー" },
+  { en: "bakery", ja: "パン屋" },
+  { en: "operation", ja: "操作" },
+  { en: "craft", ja: "工芸" },
+  { en: "dust", ja: "ほこり" },
+  { en: "pie", ja: "パイ" },
+  { en: "term", ja: "期間" },
+  { en: "wine", ja: "ワイン" },
+  { en: "volcano", ja: "火山" },
+  { en: "bubble", ja: "あわ" },
+  { en: "printer", ja: "プリンター" },
+  { en: "beside", ja: "～のそばに" },
+  { en: "birth", ja: "誕生" },
+  { en: "degree", ja: "度" },
+  { en: "lay", ja: "～を産む" },
+  { en: "lend", ja: "～を貸す" },
+  { en: "official", ja: "公式の" },
+  { en: "approach", ja: "（～に）近づく" },
+  { en: "float", ja: "浮く" },
+  { en: "include", ja: "～をふくむ" },
+  { en: "photograph", ja: "写真" },
+  { en: "branch", ja: "枝" },
+  { en: "discussion", ja: "議論" },
+  { en: "waiter", ja: "ウェーター" },
+  { en: "handmade", ja: "手作りの" },
+  { en: "shelter", ja: "避難所" },
+  { en: "signal", ja: "信号" },
+  { en: "trumpet", ja: "トランペット" },
+  { en: "drill", ja: "きり／ドリル" },
+  { en: "hurricane", ja: "ハリケーン" },
+  { en: "brave", ja: "勇敢な" },
+  { en: "deeply", ja: "深く" },
+  { en: "fourteen", ja: "14の" },
+  { en: "remove", ja: "～を取り除く" },
+  { en: "blow", ja: "吹く" },
+  { en: "apartment", ja: "アパート" },
+  { en: "audience", ja: "聴衆" },
+  { en: "corn", ja: "トウモロコシ" },
+  { en: "ourselves", ja: "私たち自身" },
+  { en: "recent", ja: "最近の" },
+  { en: "worst", ja: "最も悪い" },
+  { en: "Dutch", ja: "オランダ語" },
+  { en: "grain", ja: "穀物" },
+  { en: "lemon", ja: "レモン" },
+  { en: "refuse", ja: "～を拒む" },
+  { en: "arrange", ja: "～をきちんと整える" },
+  { en: "cafe", ja: "カフェ／喫茶店" },
+  { en: "fence", ja: "さく／フェンス" },
+  { en: "greenhouse", ja: "温室" },
+  { en: "organization", ja: "組織" },
+  { en: "inch", ja: "インチ" },
+  { en: "none", ja: "だれも～ない" },
+  { en: "purse", ja: "さいふ" },
+  { en: "fee", ja: "料金" },
+  { en: "horn", ja: "角" },
+  { en: "exploration", ja: "探検" },
+  { en: "refugee", ja: "避難民" },
+  { en: "colorful", ja: "色彩に富んだ" },
+  { en: "bar", ja: "棒" },
+  { en: "disagree", ja: "意見が合わない" },
+  { en: "Italian", ja: "イタリア語" },
+  { en: "roof", ja: "屋根" },
+  { en: "German", ja: "ドイツ語" },
+  { en: "title", ja: "題名" },
+  { en: "chef", ja: "料理長" },
+  { en: "equal", ja: "等しい" },
+  { en: "honest", ja: "正直な" },
+  { en: "impression", ja: "印象" },
+  { en: "population", ja: "人口" },
+  { en: "reporter", ja: "記者" },
+  { en: "salad", ja: "サラダ" },
+  { en: "single", ja: "たった1つの" },
+  { en: "bend", ja: "～を曲げる" },
+  { en: "emergency", ja: "非常事態" },
+  { en: "likely", ja: "ありそうな" },
+  { en: "reuse", ja: "～を再利用する" },
+  { en: "shelf", ja: "棚" },
+  { en: "string", ja: "ひも" },
+  { en: "tube", ja: "管" },
+  { en: "award", ja: "賞" },
+  { en: "globe", ja: "地球" },
+  { en: "tray", ja: "盆" },
+  { en: "aquarium", ja: "水族館" },
+  { en: "calligraphy", ja: "書道" },
+  { en: "laughter", ja: "笑い" },
+  { en: "unit", ja: "単位" },
+  { en: "clay", ja: "粘土" },
+  { en: "mascot", ja: "マスコット" },
+  { en: "riddle", ja: "なぞなぞ" },
+  { en: "input", ja: "入力" },
+  { en: "wizard", ja: "魔法使い" },
+  { en: "manager", ja: "支配人" },
+  { en: "chicken", ja: "ニワトリ" },
+  { en: "hunting", ja: "狩り" },
+  { en: "pleasure", ja: "楽しみ" },
+  { en: "stomach", ja: "胃" },
+  { en: "confuse", ja: "～を混乱させる" },
+  { en: "eighteen", ja: "18の" },
+  { en: "final", ja: "最後の" },
+  { en: "smoke", ja: "煙" },
+  { en: "advantage", ja: "利点" },
+  { en: "bake", ja: "～を焼く" },
+  { en: "flow", ja: "流れる" },
+  { en: "native", ja: "出生地の" },
+  { en: "pattern", ja: "型／パターン" },
+  { en: "designer", ja: "デザイナー" },
+  { en: "resource", ja: "資源" },
+  { en: "rocket", ja: "ロケット" },
+  { en: "stream", ja: "小川" },
+  { en: "Thailand", ja: "タイ" },
+  { en: "weed", ja: "雑草" },
+  { en: "ban", ja: "～を禁止する" },
+  { en: "carbon", ja: "炭素" },
+  { en: "consider", ja: "～をよく考える" },
+  { en: "hang", ja: "～をかける" },
+  { en: "mayor", ja: "市長" },
+  { en: "observe", ja: "～を観察する" },
+  { en: "Hawaiian", ja: "ハワイの" },
+  { en: "mosquito", ja: "カ" },
+  { en: "candle", ja: "ろうそく" },
+  { en: "complain", ja: "不平を言う" },
+  { en: "discuss", ja: "～について議論する" },
+  { en: "embarrassed", ja: "恥ずかしい" },
+  { en: "flat", ja: "平らな" },
+  { en: "including", ja: "～をふくめて" },
+  { en: "jacket", ja: "上着／ジャケット" },
+  { en: "match", ja: "試合" },
+  { en: "button", ja: "ボタン" },
+  { en: "liter", ja: "リットル" },
+  { en: "seriously", ja: "まじめに" },
+  { en: "sir", ja: "あなたさま" },
+  { en: "worth", ja: "～の価値がある" },
+  { en: "copy", ja: "～を写す" },
+  { en: "display", ja: "～を展示する" },
+  { en: "Greek", ja: "ギリシャ語" },
+  { en: "heaven", ja: "天国" },
+  { en: "medal", ja: "メダル" },
+  { en: "fit", ja: "（～に）ぴったり合う" },
+  { en: "instrument", ja: "楽器" },
+  { en: "Korean", ja: "韓国語" },
+  { en: "shower", ja: "シャワー" },
+  { en: "sidewalk", ja: "歩道" },
+  { en: "supply", ja: "～を供給する" },
+  { en: "cleanup", ja: "そうじ" },
+  { en: "operate", ja: "～を操作する" },
+  { en: "rainbow", ja: "虹" },
+  { en: "lane", ja: "車線" },
+  { en: "silk", ja: "絹" },
+  { en: "telescope", ja: "望遠鏡" },
+  { en: "ambulance", ja: "救急車" },
+  { en: "yawn", ja: "あくび" },
+  { en: "hey", ja: "やあ" },
+  { en: "itself", ja: "それ自身" },
+  { en: "industry", ja: "産業" },
+  { en: "advance", ja: "進歩する" },
+  { en: "divide", ja: "～を分ける" },
+  { en: "bark", ja: "ほえる" },
+  { en: "prefer", ja: "～のほうを好む" },
+  { en: "hobby", ja: "趣味" },
+  { en: "muscle", ja: "筋肉" },
+  { en: "noodle", ja: "めん類" },
+  { en: "quick", ja: "速い" },
+  { en: "bathroom", ja: "浴室" },
+  { en: "decrease", ja: "減る" },
+  { en: "difficulty", ja: "困難" },
+  { en: "gram", ja: "グラム" },
+  { en: "recognize", ja: "～とわかる" },
+  { en: "bat", ja: "コウモリ" },
+  { en: "brass band", ja: "吹奏楽団" },
+  { en: "effective", ja: "効果的な" },
+  { en: "mostly", ja: "大部分は" },
+  { en: "orchestra", ja: "管弦楽団" },
+  { en: "personality", ja: "個性" },
+  { en: "Pacific", ja: "太平洋の" },
+  { en: "pupil", ja: "生徒" }
+];
+
+
+// ★検索を速くするための前処理
+for (const v of VOCAB){
+  v._en = String(v.en || "").toLowerCase();
+  v._ja = String(v.ja || "").toLowerCase();
+  v._mix = v._en + "\n" + v._ja;
+  v._enEsc = escapeHtml(v.en);
+  v._jaEsc = escapeHtml(v.ja);
+}
+
+const KEY_AUDIO       = "vocab_app_audio_on_v1";
+const KEY_WRONG_SET   = "vocab_wrong_set_v1";
+const KEY_WRONG_ONLY  = "vocab_wrong_only_v1";
+const KEY_THEME       = "vocab_theme_v1";
+const KEY_RANGE       = "vocab_range_v1";
+const KEY_ORDER_MODE  = "vocab_order_mode_v1";
+const KEY_WHEEL_QUERY = "vocab_wheel_query_v1";
+
+function shuffle(arr){
+  for (let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function saveJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
+function loadJSON(key){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  }catch{ return null; }
+}
+function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+function loadRange(){
+  const saved = loadJSON(KEY_RANGE);
+  const maxN = VOCAB.length;
+  let from = 1;
+  let to = Math.min(10, maxN);
+  if (saved && typeof saved.from === "number" && typeof saved.to === "number"){
+    from = saved.from;
+    to = saved.to;
+  }
+  from = clamp(Math.floor(from), 1, maxN);
+  to   = clamp(Math.floor(to),   1, maxN);
+  if (from > to) [from, to] = [to, from];
+  return { from, to };
+}
+function saveRange(r){ saveJSON(KEY_RANGE, r); }
+
+function loadTheme(){
+  const v = localStorage.getItem(KEY_THEME);
+  return (v === "dark" || v === "light") ? v : "light";
+}
+function saveTheme(theme){ localStorage.setItem(KEY_THEME, theme); }
+function applyTheme(theme){
+  const isDark = theme === "dark";
+  document.body.classList.toggle("dark", isDark);
+  const btn = document.getElementById("themeToggle");
+  if (btn) btn.textContent = isDark ? "☀️" : "🌙";
+}
+
+function loadOrderMode(){
+  const v = localStorage.getItem(KEY_ORDER_MODE);
+  return (v === "asc" || v === "random") ? v : "random";
+}
+function saveOrderMode(mode){ localStorage.setItem(KEY_ORDER_MODE, mode); }
+function updateOrderUI(){
+  const mode = loadOrderMode();
+  const btn = document.getElementById("orderToggle");
+  if (!btn) return;
+  btn.textContent = (mode === "random") ? "🔀" : "🔢";
+}
+
+function pickEnglishVoice(){
+  const voices = speechSynthesis.getVoices();
+  const preferred =
+    voices.find(v => /Samantha|Karen/i.test(v.name || "")) ||
+    voices.find(v => (v.lang || "").toLowerCase().startsWith("en-us")) ||
+    voices.find(v => (v.lang || "").toLowerCase().startsWith("en-gb")) ||
+    voices.find(v => (v.lang || "").toLowerCase().startsWith("en")) ||
+    null;
+  return preferred;
+}
+
+function loadAudioOn(){
+  const v = localStorage.getItem(KEY_AUDIO);
+  return v === null ? true : v === "1";
+}
+function saveAudioOn(on){ localStorage.setItem(KEY_AUDIO, on ? "1" : "0"); }
+function updateAudioUI(){
+  const on = loadAudioOn();
+  document.getElementById("audioToggle").textContent = on ? "🔊" : "🔇";
+}
+
+function speakEnglish(text){
+  if (!window.speechSynthesis) return;
+  if (!loadAudioOn()) return;
+
+  try{ speechSynthesis.cancel(); }catch{}
+  const u = new SpeechSynthesisUtterance(String(text));
+  const voice = pickEnglishVoice();
+  u.lang = voice?.lang || "en-US";
+  if (voice) u.voice = voice;
+  u.rate = 1.0;
+  u.pitch = 1.0;
+  speechSynthesis.speak(u);
+}
+
+function loadWrongSet(){
+  const arr = loadJSON(KEY_WRONG_SET);
+  return new Set(Array.isArray(arr) ? arr : []);
+}
+function saveWrongSet(set){ saveJSON(KEY_WRONG_SET, Array.from(set)); }
+function updateWrongCountUI(){
+  const set = loadWrongSet();
+  document.getElementById("wrongCount").textContent = `:${set.size}`;
+}
+
+function loadWrongOnly(){ return localStorage.getItem(KEY_WRONG_ONLY) === "1"; }
+function saveWrongOnly(on){ localStorage.setItem(KEY_WRONG_ONLY, on ? "1" : "0"); }
+
+function getActiveStateKey(){
+  const { from, to } = loadRange();
+  const base = loadWrongOnly() ? "wrong" : "all";
+  return `vocab_state_${base}_r${from}-${to}_v1`;
+}
+
+function getPoolIndices(){
+  const { from, to } = loadRange();
+  const start = from - 1;
+  const end   = to - 1;
+
+  const ranged = [];
+  for (let i = start; i <= end; i++){
+    if (i >= 0 && i < VOCAB.length) ranged.push(i);
+  }
+
+  if (!loadWrongOnly()) return ranged;
+
+  const set = loadWrongSet();
+  return ranged.filter(i => set.has(VOCAB[i].en));
+}
+
+function freshStateForPool(poolIdxs){
+  const mode = loadOrderMode();
+  let order = [...Array(poolIdxs.length).keys()];
+  if (mode === "random") order = shuffle(order);
+  else order.sort((a, b) => poolIdxs[a] - poolIdxs[b]);
+  return { poolIdxs, order, index: 0, phase: 0 };
+}
+
+function loadState(){
+  const key = getActiveStateKey();
+  const st = loadJSON(key);
+  if (!st) return null;
+  if (!Array.isArray(st.poolIdxs) || !Array.isArray(st.order)) return null;
+  if (typeof st.index !== "number" || typeof st.phase !== "number") return null;
+  if (st.phase !== 0 && st.phase !== 1) return null;
+
+  const poolNow = getPoolIndices();
+  if (st.poolIdxs.length !== poolNow.length) return null;
+  return st;
+}
+function saveState(st){
+  const key = getActiveStateKey();
+  saveJSON(key, st);
+}
+
+function getCurrentItem(st){
+  if (!st.poolIdxs.length) return null;
+  const poolIndex = st.poolIdxs[ st.order[st.index] ];
+  return { item: VOCAB[poolIndex], vocabIndex: poolIndex };
+}
+
+function setUI(st){
+  const wordNumHeaderEl = document.getElementById("wordNumHeader");
+  const wordTextEl = document.getElementById("wordText");
+  const meaningEl = document.getElementById("meaning");
+  const progressEl = document.getElementById("progress");
+  const btn = document.getElementById("nextBtn");
+
+  const missBox = document.getElementById("missBox");
+  const missToggle = document.getElementById("missToggle");
+
+  if (!st.poolIdxs.length){
+    wordNumHeaderEl.textContent = "";
+    wordTextEl.textContent = "（出題がありません）";
+    meaningEl.textContent = "範囲を広げるか、「復習開始」をOFFにするか、復習リストを登録してね";
+    progressEl.textContent = "0 / 0";
+    btn.textContent = "はじめる";
+    missBox.classList.remove("show");
+    missToggle.checked = false;
+    return;
+  }
+
+  if (st.index >= st.poolIdxs.length){
+    st = freshStateForPool(getPoolIndices());
+    saveState(st);
+  }
+
+  const cur = getCurrentItem(st);
+  const current = cur.item;
+  const number = cur.vocabIndex + 1;
+
+  progressEl.textContent = `${st.index + 1} / ${st.poolIdxs.length}`;
+
+  const wrongSet = loadWrongSet();
+  missToggle.checked = wrongSet.has(current.en);
+
+  wordNumHeaderEl.textContent = number;
+  wordTextEl.textContent = current.en;
+
+  if (st.phase === 0){
+    meaningEl.textContent = "";
+    btn.textContent = "日本語訳を確認 （答え合わせ）";
+    missBox.classList.remove("show");
+    speakEnglish(current.en);
+  } else {
+    meaningEl.textContent = current.ja;
+    btn.textContent = "正解だったかな？ 次の単語へ！";
+    missBox.classList.add("show");
+  }
+}
+
+function nextAction(){
+  let st = loadState();
+  if (!st){
+    const pool = getPoolIndices();
+    st = freshStateForPool(pool);
+    saveState(st);
+    setUI(st);
+    return;
+  }
+
+  if (st.phase === 0) st.phase = 1;
+  else { st.phase = 0; st.index += 1; }
+
+  saveState(st);
+  setUI(st);
+}
+
+function resetAll(){
+  try{ speechSynthesis.cancel(); }catch{}
+  const pool = getPoolIndices();
+  const st = freshStateForPool(pool);
+  saveState(st);
+  setUI(st);
+}
+
+/* =========================================================
+   🎡 ホイール（軽量2D＋ページング）
+========================================================= */
+const wheel = {
+  overlay: null,
+  viewport: null,
+  list: null,
+  search: null,
+  hint: null,
+  btnJump: null,
+  closeBtn: null,
+  clearBtn: null,
+  openBtn: null,
+  moreBtn: null,
+
+  pool: [],
+  filtered: [],
+  activeIndex: 0,
+
+  // ページング
+  pageSize: 99999,     // ★最初に表示する最大件数（SE2向け）
+  renderedCount: 0,  // 現在描画済み件数
+  lastQuery: "",
+};
+
+function loadWheelQuery(){
+  const v = localStorage.getItem(KEY_WHEEL_QUERY);
+  return (typeof v === "string") ? v : "";
+}
+function saveWheelQuery(q){ localStorage.setItem(KEY_WHEEL_QUERY, q); }
+
+function buildWheelPool(){
+  const poolIdxs = getPoolIndices();
+  const arranged = poolIdxs.slice().sort((a,b)=>a-b);
+  return arranged.map(vocabIndex => {
+    const v = VOCAB[vocabIndex];
+    return {
+      vocabIndex,
+      _en: v._en,
+      _mix: v._mix,
+      enEsc: v._enEsc,
+      jaEsc: v._jaEsc
+    };
+  });
+}
+
+function wheelFilter(list, q){
+  const query = String(q || "").trim().toLowerCase();
+  if (!query) return list.slice();
+
+  const starts = [];
+  const contains = [];
+  for (const it of list){
+    if (it._en.startsWith(query)) starts.push(it);
+    else if (it._mix.includes(query)) contains.push(it);
+  }
+  return starts.concat(contains);
+}
+
+function wheelRender(resetPaging=true){
+  const q = wheel.search.value;
+  saveWheelQuery(q);
+  wheel.lastQuery = q;
+
+  wheel.pool = buildWheelPool();
+  wheel.filtered = wheelFilter(wheel.pool, q);
+
+  // 初期位置（現在の単語が含まれていればそこへ）
+  const st = loadState();
+  const cur = st ? getCurrentItem(st) : null;
+  let idx = 0;
+  if (cur){
+    const vi = cur.vocabIndex;
+    const found = wheel.filtered.findIndex(x => x.vocabIndex === vi);
+    if (found >= 0) idx = found;
+  }
+  wheel.activeIndex = clamp(idx, 0, Math.max(0, wheel.filtered.length - 1));
+
+  if (resetPaging){
+    wheel.renderedCount = 0;
+    wheel.list.innerHTML = "";
+  }
+
+  if (wheel.filtered.length === 0){
+    wheel.list.innerHTML =
+      `<li class="wheelItem isActive" data-index="0">
+         <div class="wheelItemInner" style="opacity:.75;border-color:transparent;">一致する単語がありません</div>
+       </li>`;
+    wheel.hint.textContent = "検索条件を変えてみてください。";
+    wheel.moreBtn.style.display = "none";
+    return;
+  }
+
+  // 追加描画（最大 pageSize 件ずつ）
+  const from = wheel.renderedCount;
+  const to = Math.min(wheel.renderedCount + wheel.pageSize, wheel.filtered.length);
+
+  let html = "";
+  for (let i = from; i < to; i++){
+    const it = wheel.filtered[i];
+    html +=
+      `<li class="wheelItem" data-index="${i}">
+         <div class="wheelItemInner">
+           <div class="num">${it.vocabIndex + 1}</div>
+           <div>
+             <div class="main">${it.enEsc}</div>
+             <span class="ja">${it.jaEsc}</span>
+           </div>
+         </div>
+       </li>`;
+  }
+
+  // 一括append（分割より安定して速いことが多い）
+  wheel.list.insertAdjacentHTML("beforeend", html);
+
+  wheel.renderedCount = to;
+
+  wheel.hint.textContent = `表示: ${wheel.filtered.length} 件（描画: ${wheel.renderedCount}/${wheel.filtered.length}）`;
+
+  // 「さらに表示」ボタン
+  wheel.moreBtn.style.display = (wheel.renderedCount < wheel.filtered.length) ? "inline-flex" : "none";
+
+  // アクティブ行の見た目更新
+  wheelUpdateActiveClass();
+
+  // 初回のみ：該当位置へ
+  if (resetPaging){
+    requestAnimationFrame(() => {
+      // activeIndexがまだ描画されていないなら、そのindexまで出す
+      while (wheel.activeIndex >= wheel.renderedCount && wheel.renderedCount < wheel.filtered.length){
+        wheelRender(false);
+      }
+      wheelScrollToIndex(wheel.activeIndex, false);
+    });
+  }
+}
+
+function wheelScrollToIndex(i, smooth){
+  const items = wheel.list.querySelectorAll(".wheelItem");
+  if (!items.length) return;
+
+  const idx = clamp(i, 0, items.length - 1);
+  const target = items[idx];
+  const top = target.offsetTop + (target.offsetHeight/2) - (wheel.viewport.clientHeight/2);
+  wheel.viewport.scrollTo({ top, behavior: smooth ? "smooth" : "auto" });
+  wheel.activeIndex = idx;
+  wheelUpdateActiveClass();
+}
+
+function wheelPickNearest(){
+  const items = wheel.list.querySelectorAll(".wheelItem");
+  if (!items.length) return 0;
+
+  const centerY = wheel.viewport.scrollTop + wheel.viewport.clientHeight/2;
+  let best = 0;
+  let bestDist = Infinity;
+
+  items.forEach((el, i) => {
+    const y = el.offsetTop + el.offsetHeight/2;
+    const d = Math.abs(y - centerY);
+    if (d < bestDist){
+      bestDist = d;
+      best = i;
+    }
+  });
+  return best;
+}
+
+function wheelSnap(){
+  const i = wheelPickNearest();
+  wheel.activeIndex = i;
+  wheelScrollToIndex(i, true);
+}
+
+function wheelUpdateActiveClass(){
+  const items = wheel.list.querySelectorAll(".wheelItem");
+  items.forEach((li, idx) => {
+    li.classList.toggle("isActive", idx === wheel.activeIndex);
+  });
+}
+
+function wheelOpen(){
+  wheel.overlay.classList.add("show");
+  wheel.overlay.setAttribute("aria-hidden", "false");
+
+  wheel.search.value = loadWheelQuery() || "";
+  wheel.list.innerHTML = "";
+  wheel.renderedCount = 0;
+
+  // 背景スクロール停止（iPhone対策）
+  document.body.style.overflow = "hidden";
+
+  // 先に表示
+  wheel.hint.textContent = "準備中…";
+  wheelRender(true);
+
+  setTimeout(() => {
+    wheel.search.focus({ preventScroll: true });
+  }, 120);
+}
+
+function wheelClose(){
+  wheel.overlay.classList.remove("show");
+  wheel.overlay.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+function wheelJumpToSelected(){
+  if (!wheel.filtered.length) return;
+  const picked = wheel.filtered[clamp(wheel.activeIndex, 0, wheel.filtered.length - 1)];
+  if (!picked) return;
+
+  const poolIdxs = getPoolIndices();
+  if (!poolIdxs.length) return;
+
+  const st = loadState() || freshStateForPool(poolIdxs);
+
+  const poolNow = getPoolIndices();
+  if (!Array.isArray(st.poolIdxs) || st.poolIdxs.length !== poolNow.length){
+    st.poolIdxs = poolNow;
+    st.order = freshStateForPool(poolNow).order;
+  }
+
+  let foundIndex = -1;
+  for (let i=0; i<st.order.length; i++){
+    const poolIndex = st.poolIdxs[ st.order[i] ];
+    if (poolIndex === picked.vocabIndex){
+      foundIndex = i;
+      break;
+    }
+  }
+
+  if (foundIndex >= 0){
+    st.index = foundIndex;
+    st.phase = 0;
+    saveState(st);
+    setUI(st);
+  }
+
+  wheelClose();
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/* =========================================================
+   init
+========================================================= */
+function init(){
+  document.getElementById("pageTitle").textContent = document.title;
+
+  if (!VOCAB.length){
+    document.getElementById("wordText").textContent = "VOCABが空です";
+    return;
+  }
+
+  applyTheme(loadTheme());
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    const now = loadTheme();
+    const next = (now === "dark") ? "light" : "dark";
+    saveTheme(next);
+    applyTheme(next);
+  });
+
+  updateOrderUI();
+
+  if (window.speechSynthesis){
+    speechSynthesis.onvoiceschanged = () => updateAudioUI();
+    setTimeout(updateAudioUI, 200);
+    setTimeout(updateAudioUI, 800);
+  } else {
+    document.getElementById("audioToggle").disabled = true;
+    document.getElementById("speakBtn").disabled = true;
+  }
+
+  const rangeFromEl = document.getElementById("rangeFrom");
+  const rangeToEl   = document.getElementById("rangeTo");
+  const r = loadRange();
+  rangeFromEl.value = r.from;
+  rangeToEl.value   = r.to;
+
+  function onRangeChange(){
+    let from = parseInt(rangeFromEl.value, 10);
+    let to   = parseInt(rangeToEl.value, 10);
+    if (!Number.isFinite(from)) from = 1;
+    if (!Number.isFinite(to)) to = VOCAB.length;
+
+    from = clamp(from, 1, VOCAB.length);
+    to   = clamp(to,   1, VOCAB.length);
+    if (from > to) [from, to] = [to, from];
+
+    rangeFromEl.value = from;
+    rangeToEl.value   = to;
+
+    saveRange({ from, to });
+
+    const pool = getPoolIndices();
+    const st = freshStateForPool(pool);
+    saveState(st);
+
+    updateWrongCountUI();
+    setUI(st);
+
+    if (wheel.overlay.classList.contains("show")){
+      wheelRender(true);
+    }
+  }
+
+  rangeFromEl.addEventListener("change", onRangeChange);
+  rangeToEl.addEventListener("change", onRangeChange);
+
+  updateWrongCountUI();
+
+  const wrongOnlyToggle = document.getElementById("wrongOnlyToggle");
+  wrongOnlyToggle.checked = loadWrongOnly();
+  wrongOnlyToggle.addEventListener("change", () => {
+    saveWrongOnly(wrongOnlyToggle.checked);
+
+    const pool = getPoolIndices();
+    const st = freshStateForPool(pool);
+    saveState(st);
+
+    updateWrongCountUI();
+    setUI(st);
+
+    if (wheel.overlay.classList.contains("show")){
+      wheelRender(true);
+    }
+  });
+
+  document.getElementById("missToggle").addEventListener("change", (e) => {
+    const st = loadState();
+    if (!st) return;
+    const cur = getCurrentItem(st);
+    if (!cur) return;
+
+    const set = loadWrongSet();
+    if (e.target.checked) set.add(cur.item.en);
+    else set.delete(cur.item.en);
+
+    saveWrongSet(set);
+    updateWrongCountUI();
+
+    if (wheel.overlay.classList.contains("show")){
+      wheelRender(true);
+    }
+  });
+
+  document.getElementById("clearWrongBtn").addEventListener("click", () => {
+    saveWrongSet(new Set());
+    updateWrongCountUI();
+
+    const pool = getPoolIndices();
+    const st = freshStateForPool(pool);
+    saveState(st);
+    setUI(st);
+
+    if (wheel.overlay.classList.contains("show")){
+      wheelRender(true);
+    }
+  });
+
+  const pool = getPoolIndices();
+  let st = loadState();
+  if (!st) st = freshStateForPool(pool);
+  saveState(st);
+  setUI(st);
+
+  document.getElementById("nextBtn").addEventListener("click", nextAction);
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+  document.getElementById("speakBtn").addEventListener("click", () => {
+    const st2 = loadState();
+    if (!st2) return;
+    const cur = getCurrentItem(st2);
+    if (!cur) return;
+    speakEnglish(cur.item.en);
+  });
+
+  document.getElementById("audioToggle").addEventListener("click", () => {
+    const on = loadAudioOn();
+    saveAudioOn(!on);
+    updateAudioUI();
+
+    const st2 = loadState();
+    if (st2 && st2.phase === 0){
+      const cur = getCurrentItem(st2);
+      if (cur) speakEnglish(cur.item.en);
+    }
+  });
+
+  document.getElementById("orderToggle").addEventListener("click", () => {
+    const now = loadOrderMode();
+    const next = (now === "random") ? "asc" : "random";
+    saveOrderMode(next);
+    updateOrderUI();
+
+    const pool2 = getPoolIndices();
+    const st2 = freshStateForPool(pool2);
+    saveState(st2);
+    setUI(st2);
+
+    if (wheel.overlay.classList.contains("show")){
+      wheelRender(true);
+    }
+  });
+
+  /* ===== 🎡 ホイール要素を紐づけ ===== */
+  wheel.overlay = document.getElementById("wheelOverlay");
+  wheel.viewport = document.getElementById("wheelViewport");
+  wheel.list = document.getElementById("wheelList");
+  wheel.search = document.getElementById("wheelSearchInput");
+  wheel.hint = document.getElementById("wheelHint");
+  wheel.btnJump = document.getElementById("wheelJumpBtn");
+  wheel.closeBtn = document.getElementById("wheelCloseBtn");
+  wheel.clearBtn = document.getElementById("wheelClearSearchBtn");
+  wheel.openBtn = document.getElementById("wheelOpenBtn");
+  wheel.moreBtn = document.getElementById("wheelMoreBtn");
+
+  wheel.openBtn.addEventListener("click", wheelOpen);
+  wheel.closeBtn.addEventListener("click", wheelClose);
+  wheel.btnJump.addEventListener("click", wheelJumpToSelected);
+
+  wheel.clearBtn.addEventListener("click", () => {
+    wheel.search.value = "";
+    saveWheelQuery("");
+    wheelRender(true);
+  });
+
+  // 「さらに表示」
+  wheel.moreBtn.addEventListener("click", () => {
+    wheelRender(false);
+  });
+
+  // オーバーレイ背景タップで閉じる
+  wheel.overlay.addEventListener("click", (e) => {
+    if (e.target === wheel.overlay) wheelClose();
+  });
+
+  // 検索：デバウンス（軽量）
+  let t = 0;
+  wheel.search.addEventListener("input", () => {
+    clearTimeout(t);
+    t = setTimeout(() => wheelRender(true), 180);
+  });
+
+  // クリック：イベント委譲（軽量）
+  wheel.list.addEventListener("click", (e) => {
+    const li = e.target.closest(".wheelItem");
+    if (!li) return;
+    const idx = parseInt(li.dataset.index || "0", 10);
+    if (!Number.isFinite(idx)) return;
+
+    // まだ描画されてない先をタップしたケースはない（タップできないので）
+    wheelScrollToIndex(idx, true);
+  });
+
+  // スクロール停止後だけスナップ（軽い）
+  let snapTimer = 0;
+  wheel.viewport.addEventListener("scroll", () => {
+    clearTimeout(snapTimer);
+    snapTimer = setTimeout(() => {
+      if (wheel.overlay.classList.contains("show")) wheelSnap();
+    }, 140);
+  }, { passive: true });
+}
+
+init();
+</script>
+</body>
+</html>
