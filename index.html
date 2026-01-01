@@ -522,9 +522,10 @@
 
     /* ✅ WakeLock状態表示（小さく） */
     .wakeBadge{
-      position:absolute;
-      right: 10px;
-      bottom: 10px;
+      position: fixed;                 /* ← 画面に固定 */
+      top: calc(env(safe-area-inset-top) + 8px); /* ← iPhoneノッチ対策 */
+      right: 8px;                      /* ← 右端 */
+      bottom: auto;                    /* ← 下固定を解除 */
       font-size: 11px;
       padding: 6px 10px;
       border-radius: 999px;
@@ -533,7 +534,9 @@
       color: inherit;
       user-select:none;
       display:none;
+      z-index: 99999;                  /* ← 最前面に */
     }
+
     body.dark .wakeBadge{
       border-color: var(--bd-dark);
       background: rgba(0,0,0,0.25);
