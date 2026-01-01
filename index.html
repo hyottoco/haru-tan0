@@ -21,6 +21,7 @@
 
       --btn-radius: 12px;
 
+      /* 復習系の淡い色（統一） */
       --review-bg: #f3f6fb;
       --review-bd: #cfd8e3;
       --review-fg: #334155;
@@ -104,6 +105,8 @@
       /* ✅ 縦の隙間を詰める */
       padding-top: 6px;
       padding-bottom: 6px;
+      padding-left: 8px;
+      padding-right: 8px;   /* ← ここを小さく */
     }
 
     .pill{ cursor: pointer; }
@@ -208,11 +211,16 @@
       text-align: left;
     }
 
-    .rangeStack{
-      display:flex;
-      align-items: center;
-      gap: 15px;
+    /* ✅ 範囲入力（No 〜）の上下ステップ（スピナー）を消す */
+    .rangeInput::-webkit-outer-spin-button,
+    .rangeInput::-webkit-inner-spin-button{
+      -webkit-appearance: none;
+      margin: 0;
     }
+    .rangeInput[type="number"]{
+      appearance: textfield;
+    }
+
 
     .word-no{
       font-size: 14px;
@@ -245,7 +253,7 @@
     }
 
     .meaning{
-      font-size: 18px;
+      font-size: 20px;
       margin: 10px 0 0;
       min-height: 40px;
       word-break: break-word;
@@ -334,6 +342,8 @@
       background: transparent;
       user-select:none;
       min-width: 20px;
+      width: fit-content;
+      flex: 0 0 auto;   /* 念のため（伸び抑制） */
     }
     body.dark .speedBox{
       border-color: var(--bd-dark);
@@ -341,7 +351,7 @@
       color: #d6d6d8;
     }
     .speedBox input[type="range"]{
-      width: 60px;
+      width: 48px;
       display: block;
       margin: 0;
     }
@@ -369,9 +379,68 @@
       flex-wrap: nowrap;
       min-width: 0;
     }
+
     .searchRow #speakBtn{
       margin-left: 0; /* この行だけ */
     }
+
+
+
+    /* ✅ Auto表示時間（探すの下段） */
+    .autoTimeRow{
+      margin-top: 8px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap: nowrap;          /* ← 1行固定 */
+    }
+
+    .autoTimeBadge{
+      flex: 0 0 auto;      /* 伸びない */
+      width: fit-content;  /* 中身ぴったり */
+      display:flex;
+      align-items:center;
+      gap:6px;
+      flex-wrap: nowrap;          /* ← 中も1行固定 */
+      overflow: hidden;           /* ← はみ出し防止 */
+    }
+
+    .msInput{
+      width: 2.5em;               /* ← 4桁分 */
+      padding: 4px 8px;
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      font-size: 14px;            /* ← 14px */
+      background: transparent;
+      color: inherit;
+    }
+
+    /* ✅ number入力の上下ステップ（スピナー）を消す */
+    .msInput::-webkit-outer-spin-button,
+    .msInput::-webkit-inner-spin-button{
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .msInput[type="number"]{
+      appearance: textfield;
+    }
+
+
+    body.dark .msInput{ border-color: var(--bd-dark); }
+
+    .miniLbl{ font-size: 13px; opacity: .85; }
+    .unit{ font-size: 12px; opacity: .75; }
+
+    /* ✅ 初期値ボタンを小さく（button.small より強く） */
+    button.small.miniBtn{
+      font-size: 14px;   /* 好みで 10〜13px */
+      padding: 6px 8px;  /* 好みで調整 */
+      border-radius: 999px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+
 
     /* PC/iPadではカードを細くして縦長に見せる */
     @media (min-width: 768px){
@@ -478,49 +547,7 @@
     .wakeDot.on{ background: #22c55e; }
     .wakeDot.off{ background: #ef4444; }
 
-    /* ✅ 範囲 + Auto を横並び、現在Noを下へ */
-    .rangeWrap{
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .rangeTop{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap: nowrap;
-    }
-
-    .rangeTop .rangeBadge{
-      flex: 1 1 auto;   /* 範囲のラベルを伸ばす */
-      min-width: 0;
-    }
-
-    .rangeTop #autoBtn{
-      flex: 0 0 auto;   /* Autoは固定幅 */
-      white-space: nowrap;
-    }
-
-    .rangeNow{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      /* padding-left: 12px; */
-      justify-content: center; /* Autoの中央下 */
-    }
-
-
-    /* 画面が狭いときはAutoを下に回す（崩れ防止） */
-    @media (max-width: 360px){
-      .rangeTop{ flex-wrap: wrap; }
-      .rangeTop #autoBtn{ width: 100%; }
-    }
-
-    /* =========================
-      ② 追加するCSS（ここから）
-    ========================= */
+    /* ✅ 範囲 + Auto を横並び、現在Noを下へ（grid版） */
     .rangeWrap{
       width: 100%;
       display: grid;
@@ -529,20 +556,16 @@
       column-gap: 10px;
     }
 
-    .rangeTop{
-      grid-column: 1 / 3;
-      display: contents;
-    }
-
+    /* ✅ rangeBadge を grid の伸び（stretch）から外して、中身の幅に合わせる */
     .rangeBadge{
-      grid-column: 1;
+      justify-self: start;     /* ← これが本命 */
+      width: fit-content;      /* ← 念のため（iOSでも効きやすい） */
     }
 
-    #autoBtn{
-      grid-column: 2;
-      white-space: nowrap;
-    }
 
+    .rangeTop{ grid-column: 1 / 3; display: contents; }
+    .rangeBadge{ grid-column: 1; }
+    #autoBtn{ grid-column: 2; white-space: nowrap; }
     .rangeNow{
       grid-column: 2;
       display:flex;
@@ -550,23 +573,10 @@
       gap:8px;
       padding-left: 2px;
     }
-
     @media (max-width: 360px){
-      .rangeWrap{
-        grid-template-columns: 1fr;
-      }
-      #autoBtn,
-      .rangeNow{
-        grid-column: 1;
-      }
+      .rangeWrap{ grid-template-columns: 1fr; }
+      #autoBtn, .rangeNow{ grid-column: 1; }
     }
-    /* =========================
-      ② 追加するCSS（ここまで）
-    ========================= */
-</style>
-
-
-
   </style>
 </head>
 
@@ -617,7 +627,6 @@
       </div>
     </div>
 
-
     <div class="displayArea">
       <div class="word">
         <span class="word-text" id="wordText">（reading…）</span>
@@ -646,6 +655,23 @@
         <button id="speakBtn" type="button">🔊 発音</button>
       </div>
     </div>
+
+    <!-- ✅ 探すボタンの下段：time（1行に収める） -->
+    <div class="row autoTimeRow">
+      <div class="badge autoTimeBadge">
+        ▶︎ms:
+        <span class="miniLbl">英</span>
+        <input id="autoEnMs" class="msInput" type="number" min="200" max="9999" step="100">
+        <!-- <span class="unit">ms</span> -->
+        <span class="unit">:</span>
+        <span class="miniLbl">日</span>
+        <input id="autoJaMs" class="msInput" type="number" min="200" max="9999" step="100">
+        <!-- <span class="unit">ms</span> -->
+      </div>
+
+      <button class="small miniBtn reviewUI pressWhite" id="autoTimeResetBtn" type="button">初期値</button>
+    </div>
+
 
     <!-- ✅ WakeLockステータス -->
     <div class="wakeBadge" id="wakeBadge" title="Auto中はスリープしにくくします（対応ブラウザのみ）">
@@ -2495,7 +2521,6 @@ const VOCAB = [
   { en: "Pacific", ja: "太平洋の" },
   { en: "pupil", ja: "生徒" }
 ];
-
 /* =========================
    ユーティリティ
 ========================= */
@@ -2549,6 +2574,11 @@ const speakBtn = $("speakBtn");
 const rateRange = $("rateRange");
 const rateLabel = $("rateLabel");
 
+/* ✅ Auto表示時間UI */
+const autoEnMsInput = $("autoEnMs");
+const autoJaMsInput = $("autoJaMs");
+const autoTimeResetBtn = $("autoTimeResetBtn");
+
 /* Wake lock UI */
 const wakeBadge = $("wakeBadge");
 const wakeDot = $("wakeDot");
@@ -2568,7 +2598,7 @@ const wheelHint = $("wheelHint");
 /* =========================
    状態（phase方式）
 ========================= */
-const APP_KEY = "ei_idiom_state_v2";
+const APP_KEY = "ei_idiom_state_v3";
 
 const state = {
   idx: 0,
@@ -2587,7 +2617,11 @@ const state = {
   started: false,
   phase: 0,     // 0:出題  1:答え
 
-  autoOn: false // ✅ Auto運転中か
+  autoOn: false, // ✅ Auto運転中か
+
+  /* ✅ Auto表示時間（ms） */
+  autoEnMs: 1000,
+  autoJaMs: 1500,
 };
 
 function loadState(){
@@ -2609,6 +2643,9 @@ function loadState(){
   if(typeof saved.phase === "number") state.phase = saved.phase;
 
   if(typeof saved.autoOn === "boolean") state.autoOn = saved.autoOn;
+
+  if(typeof saved.autoEnMs === "number") state.autoEnMs = saved.autoEnMs;
+  if(typeof saved.autoJaMs === "number") state.autoJaMs = saved.autoJaMs;
 }
 function saveState(){ LS.set(APP_KEY, state); }
 
@@ -2672,14 +2709,11 @@ function speakCurrent(){
 
 /* =========================
    ✅ Wake Lock（スリープ対策）
-   - 対応ブラウザ：Screen Wake Lock API
-   - iPhone Safariは非対応が多いので簡易フォールバック
 ========================= */
 let wakeLockSentinel = null;
 let wakeKeepAliveTimer = 0;
 
 function setWakeUI(on, reason){
-  // Auto中だけ表示
   wakeBadge.classList.toggle("show", !!state.autoOn);
   wakeDot.classList.toggle("on", !!on);
   wakeDot.classList.toggle("off", !on);
@@ -2690,20 +2724,16 @@ function setWakeUI(on, reason){
 }
 
 async function requestWakeLock(){
-  // まずUIを出す（Auto中のみ）
   setWakeUI(false, "WakeLockを取得中…");
 
-  // 可能なら Screen Wake Lock
   try{
     if("wakeLock" in navigator && navigator.wakeLock && navigator.wakeLock.request){
       wakeLockSentinel = await navigator.wakeLock.request("screen");
       setWakeUI(true, "WakeLock: Screen Wake Lock APIで維持中");
 
-      // OS/ブラウザ都合で解除されたら再取得を試みる
       wakeLockSentinel.addEventListener("release", () => {
         wakeLockSentinel = null;
         if(state.autoOn && document.visibilityState === "visible"){
-          // すぐ再取得
           requestWakeLock().catch(()=>{});
         }else{
           setWakeUI(false, "WakeLock: OFF");
@@ -2713,18 +2743,11 @@ async function requestWakeLock(){
       return;
     }
   }catch(e){
-    // 次へ（フォールバック）
+    // フォールバックへ
   }
 
-  // フォールバック（iPhone Safari等）
-  // 画面を確実に起こすことはできないが、軽い処理を回して「寝にくく」する
-  // + ユーザーに「タップで延命」できるよう説明を title に入れる
   clearInterval(wakeKeepAliveTimer);
-  wakeKeepAliveTimer = setInterval(() => {
-    // ごく軽い処理（レイアウト変更などはしない）
-    // 何もしないよりはマシ、という程度
-    void Date.now();
-  }, 25_000);
+  wakeKeepAliveTimer = setInterval(() => { void Date.now(); }, 25_000);
 
   setWakeUI(false, "このブラウザはWakeLock非対応の可能性があります（iPhone Safari等）。Auto中は時々画面をタップすると維持しやすいです。");
 }
@@ -2744,7 +2767,6 @@ async function releaseWakeLock(){
   setWakeUI(false, "WakeLock: OFF");
 }
 
-// タブが非表示→表示に戻ったら、Auto中は取り直す
 document.addEventListener("visibilitychange", () => {
   if(!state.autoOn) return;
   if(document.visibilityState === "visible"){
@@ -2755,6 +2777,10 @@ document.addEventListener("visibilitychange", () => {
 /* =========================
    UI更新
 ========================= */
+function updateAutoBtn(){
+  autoBtn.textContent = state.autoOn ? "⏸ Auto" : "▶︎ Auto";
+}
+
 function updateTopUI(){
   const total = state.shuffled.length;
 
@@ -2782,6 +2808,10 @@ function updateTopUI(){
 
   rateRange.value = String(state.rate);
   rateLabel.textContent = `${state.rate.toFixed(1)}x`;
+
+  // ✅ Auto時間UI
+  autoEnMsInput.value = String(state.autoEnMs);
+  autoJaMsInput.value = String(state.autoJaMs);
 
   updateAutoBtn();
 }
@@ -2838,6 +2868,15 @@ function render(){
 /* =========================
    操作（2段階）
 ========================= */
+function stopAuto(){
+  state.autoOn = false;
+  if(autoTimer) clearTimeout(autoTimer);
+  autoTimer = 0;
+  updateAutoBtn();
+  saveState();
+  releaseWakeLock().catch(()=>{});
+}
+
 function startOrAdvance(){
   stopAuto(); // ✅ 手動操作でAuto停止
 
@@ -2887,13 +2926,19 @@ function clearWrong(){
   render();
 }
 
-function applyRangeFromInputs(){
+function applyFromInput(){
   stopAuto();
 
-  const a = Number(rangeFrom.value || 1);
-  const b = Number(rangeTo.value || 1);
-  state.rangeFrom = clamp(a, 1, VOCAB.length);
-  state.rangeTo   = clamp(b, 1, VOCAB.length);
+  let from = Number(rangeFrom.value || 1);
+  let to   = Number(rangeTo.value   || 1);
+
+  from = clamp(from, 1, VOCAB.length);
+
+  // ✅ 〇は □ を超えられない
+  if(from > to) from = to;
+
+  state.rangeFrom = from;
+  rangeFrom.value = String(from);
 
   buildOrder();
   state.idx = 0;
@@ -2902,28 +2947,33 @@ function applyRangeFromInputs(){
   render();
 }
 
+function applyToInput(){
+  stopAuto();
+
+  let from = Number(rangeFrom.value || 1);
+  let to   = Number(rangeTo.value   || 1);
+
+  to = clamp(to, 1, VOCAB.length);
+
+  // ✅ □ は 〇 未満にできない
+  if(to < from) to = from;
+
+  state.rangeTo = to;
+  rangeTo.value = String(to);
+
+  buildOrder();
+  state.idx = 0;
+  state.started = false;
+  state.phase = 0;
+  render();
+}
+
+
+
 /* =========================
-   ✅ Auto運転（英1秒→和2秒）
-   - Auto中だけ「答え表示」を長めにする
+   ✅ Auto運転（表示時間をUIで変更）
 ========================= */
-const AUTO_EN_MS = 1000;
-const AUTO_JA_MS = 1500;
-
 let autoTimer = 0;
-
-function updateAutoBtn(){
-  autoBtn.textContent = state.autoOn ? "⏸ Auto" : "▶︎ Auto";
-}
-
-function stopAuto(){
-  state.autoOn = false;
-  if(autoTimer) clearTimeout(autoTimer);
-  autoTimer = 0;
-  updateAutoBtn();
-  saveState();
-  // ✅ スリープ対策も解除
-  releaseWakeLock().catch(()=>{});
-}
 
 function scheduleAuto(ms){
   if(autoTimer) clearTimeout(autoTimer);
@@ -2938,7 +2988,6 @@ function startAuto(){
   updateAutoBtn();
   saveState();
 
-  // ✅ Auto開始時にスリープ対策
   requestWakeLock().catch(()=>{});
   setWakeUI(!!wakeLockSentinel, wakeBadge.title);
 
@@ -2955,25 +3004,25 @@ function autoTick(){
     return;
   }
 
-  // 未開始なら開始（英語表示）→1秒待つ
+  // 未開始なら開始（英語表示）→英の時間待つ
   if(!state.started){
     state.started = true;
     state.phase = 0;
     render();
     speakCurrent();
-    scheduleAuto(AUTO_EN_MS);
+    scheduleAuto(state.autoEnMs);
     return;
   }
 
-  // 英語 → 和訳（答え表示は2秒待つ）
+  // 英語 → 和訳（和の時間待つ）
   if(state.phase === 0){
     state.phase = 1;
     render();
-    scheduleAuto(AUTO_JA_MS);
+    scheduleAuto(state.autoJaMs);
     return;
   }
 
-  // 和訳 → 次の英語（英語は1秒待つ）
+  // 和訳 → 次の英語（英の時間待つ）
   if(state.idx >= state.shuffled.length - 1){
     state.idx = 0;
   }else{
@@ -2982,8 +3031,40 @@ function autoTick(){
   state.phase = 0;
   render();
   speakCurrent();
-  scheduleAuto(AUTO_EN_MS);
+  scheduleAuto(state.autoEnMs);
 }
+
+/* =========================
+   ✅ Auto時間UI処理
+========================= */
+function sanitizeMs(v, min, max, fallback){
+  const n = Number(v);
+  if(!Number.isFinite(n)) return fallback;
+  return clamp(Math.round(n), min, max);
+}
+
+autoEnMsInput.addEventListener("change", () => {
+  stopAuto();
+  state.autoEnMs = sanitizeMs(autoEnMsInput.value, 200, 10000, 1000);
+  autoEnMsInput.value = String(state.autoEnMs);
+  saveState();
+});
+
+autoJaMsInput.addEventListener("change", () => {
+  stopAuto();
+  state.autoJaMs = sanitizeMs(autoJaMsInput.value, 200, 20000, 1500);
+  autoJaMsInput.value = String(state.autoJaMs);
+  saveState();
+});
+
+autoTimeResetBtn.addEventListener("click", () => {
+  stopAuto();
+  state.autoEnMs = 1000;
+  state.autoJaMs = 1500;
+  autoEnMsInput.value = String(state.autoEnMs);
+  autoJaMsInput.value = String(state.autoJaMs);
+  saveState();
+});
 
 /* =========================
    Wheel（検索）
@@ -3190,8 +3271,9 @@ orderToggle.addEventListener("click", () => {
   render();
 });
 
-rangeFrom.addEventListener("change", applyRangeFromInputs);
-rangeTo.addEventListener("change", applyRangeFromInputs);
+// ======== イベント ========
+rangeFrom.addEventListener("change", applyFromInput);
+rangeTo.addEventListener("change", applyToInput);
 
 rateRange.addEventListener("input", () => {
   state.rate = Number(rateRange.value);
@@ -3250,6 +3332,10 @@ document.addEventListener("keydown", (e) => { if(e.key === "Escape" && wheelOver
   rateRange.value = String(state.rate);
   rateLabel.textContent = `${state.rate.toFixed(1)}x`;
 
+  // ✅ Auto時間の補正
+  state.autoEnMs = clamp(Number(state.autoEnMs) || 1000, 200, 10000);
+  state.autoJaMs = clamp(Number(state.autoJaMs) || 1500, 200, 20000);
+
   if(!Array.isArray(state.shuffled) || state.shuffled.length === 0){
     buildOrder();
   }else{
@@ -3265,6 +3351,9 @@ document.addEventListener("keydown", (e) => { if(e.key === "Escape" && wheelOver
   autoTimer = 0;
   updateAutoBtn();
   setWakeUI(false, "WakeLock: OFF");
+
+  rangeFrom.max = String(state.rangeTo);
+  rangeTo.min   = String(state.rangeFrom);
 
   render();
 })();
